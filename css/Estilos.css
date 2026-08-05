@@ -1,0 +1,660 @@
+/*CONFIGURACIÓN GENERAL*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+}
+
+/*HEADER*/
+
+header{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 10px;
+    background-color: #0F172A;
+    color: white;
+}
+
+/*LOGO*/
+
+header h1{
+    font-size: 50px;
+}
+
+/*MENÚ*/
+
+nav a{
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+    transition: .3s;
+}
+
+nav a:hover{
+    background-color: #18336e;
+    color: white;
+}
+
+/*BOTONES DEL HEADER*/
+
+.registros a{
+    padding: 10px;
+    background-color: white;
+    color: #18336e;
+    text-decoration: none;
+    border-radius: 10px;
+    margin-right: 15px;
+    transition: .3s;
+}
+
+.registros a:hover{
+    background-color: #18336e;
+    color: white;
+}
+
+/*HERO*/
+
+.hero{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 80px;
+    gap: 40px;
+}
+
+/*DESCRIPCIÓN*/
+
+.descripcion{
+    width: 55%;
+}
+
+.descripcion h1{
+    font-size: 55px;
+    margin-bottom: 20px;
+    color: #0F172A;
+}
+
+.descripcion p{
+    font-size: 20px;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/*BOTONES DEL HERO*/
+
+.descripcion a{
+    display: inline-block;
+    padding: 12px 18px;
+    background-color: #0F172A;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    margin-right: 15px;
+    transition: .3s;
+}
+
+.descripcion a:hover{
+    background-color: #18336e;
+}
+
+/*IMAGEN*/
+
+.imagen{
+    width: 45%;
+}
+
+.imagen img{
+    width: 100%;
+    border-radius: 15px;
+}
+
+/*POR QUÉ ELEGIRNOS*/
+
+.porque-elegirnos{
+    padding: 60px 80px;
+    text-align: center;
+    background-color: #f8f8f8;
+}
+
+.porque-elegirnos h1{
+    font-size: 40px;
+    color: #0F172A;
+    margin-bottom: 40px;
+}
+
+.porque-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.porque-card{
+    background-color: white;
+    padding: 30px 20px;
+    border-radius: 15px;
+    transition: .3s;
+}
+
+.porque-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.porque-foto{
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.porque-card h3{
+    font-size: 20px;
+    color: #0F172A;
+    margin-bottom: 10px;
+}
+
+.porque-card p{
+    color: #666;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/*TESTIMONIOS*/
+
+.testimonios{
+    padding: 60px 80px;
+    text-align: center;
+}
+
+.testimonios h1{
+    font-size: 40px;
+    color: #0F172A;
+    margin-bottom: 40px;
+}
+
+.testimonios-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.testimonio-card{
+    background-color: #f8f8f8;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: left;
+}
+
+.testimonio-texto{
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.testimonio-autor{
+    color: #0F172A;
+    font-weight: bold;
+}
+
+/*FORMULARIOS (LOGIN Y REGISTRO)*/
+
+.formulario-container{
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #f8f8f8;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.formulario-container h1{
+    font-size: 32px;
+    color: #0F172A;
+    margin-bottom: 30px;
+}
+
+.formulario-container form{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.formulario-container input{
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.formulario-container input:focus{
+    outline: none;
+    border-color: #0F172A;
+}
+
+.formulario-container textarea{
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    resize: vertical;
+}
+
+.formulario-container button{
+    padding: 12px;
+    background-color: #0F172A;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.formulario-container button:hover{
+    background-color: #18336e;
+}
+
+#mensaje{
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/*DESTINOS*/
+
+.destinos-container{
+    padding: 60px 80px;
+}
+
+.destinos-container h1{
+    font-size: 40px;
+    color: #0F172A;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.destinos-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.destino-card{
+    background-color: #f8f8f8;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.destino-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.destino-card img{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.destino-card-info{
+    padding: 20px;
+}
+
+.destino-card-info h3{
+    font-size: 22px;
+    color: #0F172A;
+    margin-bottom: 5px;
+}
+
+.destino-card-info p{
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.destino-card-precio{
+    font-weight: bold;
+    color: #0F172A;
+    font-size: 18px;
+}
+
+/*NOSOTROS - HISTORIA*/
+
+.nosotros-historia{
+    padding: 60px 80px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.nosotros-historia h1{
+    font-size: 40px;
+    color: #0F172A;
+    margin-bottom: 20px;
+}
+
+.nosotros-historia p{
+    font-size: 18px;
+    line-height: 1.7;
+    color: #555;
+}
+
+/*NOSOTROS - MISIÓN Y VISIÓN*/
+
+.nosotros-mv{
+    display: flex;
+    gap: 30px;
+    padding: 20px 80px 60px;
+}
+
+.mv-card{
+    flex: 1;
+    background-color: #f8f8f8;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.mv-card h2{
+    font-size: 26px;
+    color: #0F172A;
+    margin-bottom: 15px;
+}
+
+.mv-card p{
+    color: #555;
+    line-height: 1.6;
+}
+
+/*NOSOTROS - VALORES*/
+
+.nosotros-valores{
+    padding: 60px 80px;
+    background-color: #0F172A;
+    text-align: center;
+}
+
+.nosotros-valores h1{
+    font-size: 40px;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.valores-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.valor-card{
+    background-color: #18336e;
+    padding: 30px 20px;
+    border-radius: 15px;
+    transition: .3s;
+}
+
+.valor-card:hover{
+    transform: translateY(-5px);
+}
+
+.valor-card h3{
+    color: white;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.valor-card p{
+    color: #cbd5e1;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/*NOSOTROS - EQUIPO*/
+
+.nosotros-equipo{
+    padding: 60px 80px;
+    text-align: center;
+}
+
+.nosotros-equipo h1{
+    font-size: 40px;
+    color: #0F172A;
+    margin-bottom: 40px;
+}
+
+.equipo-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.equipo-card{
+    background-color: #f8f8f8;
+    padding: 30px 20px;
+    border-radius: 15px;
+    transition: .3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.equipo-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.equipo-foto{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.equipo-card h3{
+    font-size: 20px;
+    color: #0F172A;
+    margin-bottom: 5px;
+}
+
+.equipo-card p{
+    color: #666;
+    font-size: 14px;
+}
+
+@media (max-width: 700px){
+    .equipo-grid{
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/*Ofertas*/
+
+.ofertas{
+    padding: 40px 80px;
+}
+
+.oferta-card{
+    background-color: #0F172A;
+    background: linear-gradient(135deg, #0F172A, #18336e);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.oferta-tag{
+    display: inline-block;
+    background-color: rgba(255,255,255,0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.oferta-card h1{
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.oferta-card p{
+    font-size: 16px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.oferta-card a{
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: white;
+    color: #0F172A;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.oferta-card a:hover{
+    background-color: #e2e8f0;
+}
+
+/*ESTADÍSTICAS*/
+
+.estadisticas{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 60px 80px;
+    background-color: #0F172A;
+    text-align: center;
+}
+
+.estadistica-item h2{
+    font-size: 45px;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.estadistica-item p{
+    color: #cbd5e1;
+    font-size: 16px;
+}
+
+/*FAQ*/
+
+.faq{
+    padding: 60px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq h1{
+    font-size: 40px;
+    color: #0F172A;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.faq-item{
+    border-bottom: 1px solid #ddd;
+}
+
+.faq-pregunta{
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 20px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #0F172A;
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.faq-respuesta{
+    display: none;
+    padding-bottom: 20px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.faq-item.activo .faq-respuesta{
+    display: block;
+}
+
+/*FOOTER*/
+
+.footer{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 60px 80px 40px;
+    background-color: #0F172A;
+}
+
+.footer-col{
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-col h2{
+    color: white;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.footer-col h3{
+    color: white;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.footer-col p{
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.footer-col a{
+    display: block;
+    color: #94a3b8;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: .3s;
+}
+
+.footer-col a:hover{
+    color: white;
+}
+
+.footer-redes{
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-derechos{
+    background-color: #0F172A;
+    border-top: 1px solid #334155;
+    text-align: center;
+    padding: 20px;
+}
+
+.footer-derechos p{
+    color: #94a3b8;
+    font-size: 14px;
+}

@@ -91,7 +91,7 @@ if (destinosGrid) {
                 const card = document.createElement('div');
                 card.classList.add('destino-card');
                 card.innerHTML = `
-                    <img src="../Img/${destino.imagen}" alt="${destino.nombre}">
+                    <img src="${destino.imagen}" alt="${destino.nombre}">
                     <div class="destino-card-info">
                         <h3>${destino.nombre}</h3>
                         <p>${destino.pais} · ${destino.duracion_dias} días</p>

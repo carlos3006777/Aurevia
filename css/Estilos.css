@@ -448,6 +448,7 @@ nav a:hover{
     flex-direction: column;
     align-items: center;
     text-align: center;
+    position: relative;
 }
 
 .equipo-card:hover{
@@ -461,6 +462,14 @@ nav a:hover{
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
+}
+
+.foto-pendiente-text {
+    font-size: 13px;
+    color: #666666;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    font-weight: 500;
 }
 
 .equipo-card h3{

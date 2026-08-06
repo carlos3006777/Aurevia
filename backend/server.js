@@ -3,16 +3,15 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const app = express();
+
+// Permitir solicitudes desde el frontend publicado en Render
 app.use(cors());
 app.use(express.json());
 
-//Conexion Backend (Noje.js) - BDD
+// Conexión a Base de Datos en Render (usa DATABASE_URL si existe, o cae a local)
 const pool = new Pool({
-    user: 'postgres',
-    password: 'carlos2006',
-    host: 'localhost',
-    port: 5432,
-    database: 'aurevia'
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:carlos2006@localhost:5432/aurevia',
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
 app.get('/', (req, res) => {
@@ -28,7 +27,7 @@ app.get('/api/destinos', async (req, res) => {
         res.status(500).send('Error al obtener destinos');
     }
 });
-   
+    
 app.get('/api/paquetes', async (req, res) => {
     try {
         const resultado = await pool.query(`
@@ -91,7 +90,8 @@ app.post('/api/contacto', async (req, res) => {
     }
 });
 
-// El servidor se ejecuta en localhost (esta computadora), puerto 3000
-app.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+// Usar el puerto que asigna Render automáticamente
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

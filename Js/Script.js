@@ -1,3 +1,5 @@
+const API_URL = 'https://aurevia-ye9a.onrender.com';
+
 // REGISTRO
 const formRegistro = document.getElementById('formRegistro');
 
@@ -20,7 +22,7 @@ if (formRegistro) {
         }
 
         try {
-            const respuesta = await fetch('http://localhost:3000/api/registro', {
+            const respuesta = await fetch(`${API_URL}/api/registro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre, apellido, correo, telefono, contrasena })
@@ -54,8 +56,7 @@ if (formLogin) {
         const mensaje = document.getElementById('mensaje');
 
         try {
-            // Conexion Frontend (Html/Js) - Backend (Node.js)
-            const respuesta = await fetch('http://localhost:3000/api/login', {
+            const respuesta = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ correo, contrasena })
@@ -83,7 +84,7 @@ if (formLogin) {
 const destinosGrid = document.getElementById('destinosGrid');
 
 if (destinosGrid) {
-    fetch('http://localhost:3000/api/destinos')
+    fetch(`${API_URL}/api/destinos`)
         .then(respuesta => respuesta.json())
         .then(destinos => {
             destinos.forEach(destino => {
@@ -110,7 +111,7 @@ if (destinosGrid) {
 const paquetesGrid = document.getElementById('paquetesGrid');
 
 if (paquetesGrid) {
-    fetch('http://localhost:3000/api/paquetes')
+    fetch(`${API_URL}/api/paquetes`)
         .then(respuesta => respuesta.json())
         .then(paquetes => {
             paquetes.forEach(paquete => {
@@ -150,7 +151,7 @@ if (formContacto) {
         const mensaje = document.getElementById('mensaje');
 
         try {
-            const respuesta = await fetch('http://localhost:3000/api/contacto', {
+            const respuesta = await fetch(`${API_URL}/api/contacto`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre, correo, telefono, destino_interes, mensaje: mensaje_texto })

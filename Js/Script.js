@@ -2,7 +2,6 @@ const API_URL = 'https://aurevia-ye9a.onrender.com';
 
 // REGISTRO
 const formRegistro = document.getElementById('formRegistro');
-
 if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -44,9 +43,8 @@ if (formRegistro) {
     });
 }
 
-// LOGIN
+// LOGIN (CON VALIDACIÓN DE USUARIO NO ENCONTRADO)
 const formLogin = document.getElementById('formLogin');
-
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -68,6 +66,9 @@ if (formLogin) {
                 setTimeout(() => {
                     window.location.href = '../index.html';
                 }, 1500);
+            } else if (respuesta.status === 404) {
+                mensaje.innerHTML = 'Usuario no encontrado. <a href="sign_up.html" style="color: blue; text-decoration: underline;">Regístrate aquí</a>';
+                mensaje.style.color = 'red';
             } else {
                 mensaje.textContent = 'Correo o contraseña incorrectos';
                 mensaje.style.color = 'red';
@@ -80,40 +81,73 @@ if (formLogin) {
     });
 }
 
-// MOSTRAR DESTINOS
+// MOSTRAR DESTINOS (CON HOVER Y CONSUMO DE API O LOCAL)
 const destinosGrid = document.getElementById('destinosGrid');
-
 if (destinosGrid) {
     fetch(`${API_URL}/api/destinos`)
         .then(respuesta => respuesta.json())
         .then(destinos => {
+            destinosGrid.innerHTML = "";
             destinos.forEach(destino => {
-                const card = document.createElement('div');
-                card.classList.add('destino-card');
-                card.innerHTML = `
-                    <img src="${destino.imagen}" alt="${destino.nombre}">
-                    <div class="destino-card-info">
-                        <h3>${destino.nombre}</h3>
-                        <p>${destino.pais} · ${destino.duracion_dias} días</p>
-                        <p class="destino-card-precio">Desde $${destino.precio_desde}</p>
+                destinosGrid.innerHTML += `
+                    <div class="destino-card">
+                        <img src="${destino.imagen}" alt="${destino.nombre}">
+                        <div class="destino-info-basica">
+                            <h3>${destino.nombre}</h3>
+                            <p>${destino.pais} · ${destino.duracion_dias || destino.dias} días</p>
+                            <span>Desde $${destino.precio_desde || destino.precio}</span>
+                        </div>
+                        <div class="destino-overlay">
+                            <h3>${destino.nombre}</h3>
+                            <p>${destino.descripcion || 'Disfruta de una experiencia inolvidable con tours guiados y hospedaje exclusivo.'}</p>
+                        </div>
                     </div>
                 `;
-                destinosGrid.appendChild(card);
             });
         })
         .catch(error => {
-            console.error('Error al cargar destinos:', error);
-            destinosGrid.innerHTML = '<p>No se pudieron cargar los destinos.</p>';
+            console.error('Error al cargar destinos de la API, cargando datos locales:', error);
+            // Carga respaldo local si falla la API
+            cargarDestinosLocales();
         });
+}
+
+function cargarDestinosLocales() {
+    const destinosLocales = [
+        { nombre: "París", pais: "Francia", dias: 7, precio: "899.00", imagen: "../img/paris.jpg", descripcion: "Conoce la Torre Eiffel, camina por el Sena y disfruta de la gastronomía francesa." },
+        { nombre: "Maldivas", pais: "Maldivas", dias: 5, precio: "1299.00", imagen: "../img/maldivas.jpg", descripcion: "Relájate en villas sobre el agua y explora arrecifes de coral." },
+        { nombre: "Kyoto", pais: "Japón", dias: 6, precio: "1099.00", imagen: "../img/kyoto.jpg", descripcion: "Camina entre templos milenarios, jardines zen y experimenta la cultura tradicional." },
+        { nombre: "Cancún", pais: "México", dias: 5, precio: "650.00", imagen: "../img/cancun.jpg", descripcion: "Disfruta de playas de arena blanca, aguas turquesas y ruinas mayas." },
+        { nombre: "Nueva York", pais: "Estados Unidos", dias: 6, precio: "1099.00", imagen: "../img/nuevayork.jpg", descripcion: "Recorre Times Square, pasea por Central Park y disfruta de la vida nocturna." },
+        { nombre: "Cusco", pais: "Perú", dias: 7, precio: "799.00", imagen: "../img/cusco.jpg", descripcion: "Explora la cuna del imperio inca y visita la maravilla del mundo Machu Picchu." }
+    ];
+
+    destinosGrid.innerHTML = "";
+    destinosLocales.forEach(destino => {
+        destinosGrid.innerHTML += `
+            <div class="destino-card">
+                <img src="${destino.imagen}" alt="${destino.nombre}">
+                <div class="destino-info-basica">
+                    <h3>${destino.nombre}</h3>
+                    <p>${destino.pais} · ${destino.dias} días</p>
+                    <span>Desde $${destino.precio}</span>
+                </div>
+                <div class="destino-overlay">
+                    <h3>${destino.nombre}</h3>
+                    <p>${destino.descripcion}</p>
+                </div>
+            </div>
+        `;
+    });
 }
 
 // MOSTRAR PAQUETES
 const paquetesGrid = document.getElementById('paquetesGrid');
-
 if (paquetesGrid) {
     fetch(`${API_URL}/api/paquetes`)
         .then(respuesta => respuesta.json())
         .then(paquetes => {
+            paquetesGrid.innerHTML = "";
             paquetes.forEach(paquete => {
                 const card = document.createElement('div');
                 card.classList.add('destino-card');
@@ -138,7 +172,6 @@ if (paquetesGrid) {
 
 // FORMULARIO DE CONTACTO
 const formContacto = document.getElementById('formContacto');
-
 if (formContacto) {
     formContacto.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -173,13 +206,11 @@ if (formContacto) {
     });
 }
 
-// FAQ - MOSTRAR/OCULTAR RESPUESTAS
+// FAQ - ACCIONAR DESPLEGABLES
 const preguntasFaq = document.querySelectorAll('.faq-pregunta');
-
 preguntasFaq.forEach(pregunta => {
     pregunta.addEventListener('click', () => {
         const item = pregunta.parentElement;
         item.classList.toggle('activo');
     });
 });
-

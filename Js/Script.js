@@ -183,12 +183,3 @@ preguntasFaq.forEach(pregunta => {
     });
 });
 
-// Función para abrir la ventana modal
-function abrirModal(idModal) {
-    document.getElementById(idModal).style.display = "block";
-}
-
-// Función para cerrar la ventana modal
-function cerrarModal(idModal) {
-    document.getElementById(idModal).style.display = "none";
-}

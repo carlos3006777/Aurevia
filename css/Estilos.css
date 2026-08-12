@@ -666,3 +666,41 @@ nav a:hover{
     color: #94a3b8;
     font-size: 14px;
 }
+
+/* Estilos para el despliegue de Preguntas Frecuentes */
+.faq-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+details {
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+details:hover {
+    background-color: #f8f9fa;
+}
+
+summary {
+    font-weight: bold;
+    font-size: 1.05rem;
+    color: #0f2347;
+    outline: none;
+}
+
+details p {
+    margin-top: 10px;
+    color: #555555;
+    line-height: 1.5;
+}

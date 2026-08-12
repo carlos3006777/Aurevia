@@ -705,3 +705,52 @@ details p {
     line-height: 1.5;
 }
 
+/* Botón Check-in */
+.btn-checkin {
+    background-color: #0f2347;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-checkin:hover {
+    background-color: #1d3b6e;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 3000;
+}
+
+.modal-contenido {
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.cerrar-modal {
+    position: absolute;
+    right: 15px; top: 10px;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.cerrar-modal:hover {
+    color: #ff0000;
+}

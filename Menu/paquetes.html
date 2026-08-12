@@ -27,11 +27,39 @@
     <main>
         <section class="destinos-container">
             <h1>Nuestros Paquetes</h1>
+            
+            <!-- Botón para abrir la ventana emergente de Check-in -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn-checkin" onclick="abrirModalCheckin()">Realizar Check-in de Reserva</button>
+            </div>
+
             <div class="destinos-grid" id="paquetesGrid">
                 
             </div>
         </section>
     </main>
+
+    <!-- Ventana Flotante (Modal) de Check-in -->
+    <div id="modal-checkin" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalCheckin()">&times;</span>
+            <h2>Check-in Rápido</h2>
+            <form id="formCheckin" onsubmit="procesarCheckin(event)">
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label for="codigo_reserva">Código de Reserva:</label>
+                    <input type="text" id="codigo_reserva" placeholder="Ej: AUR-12345" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+                </div>
+                
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label for="documento">Cédula o Pasaporte:</label>
+                    <input type="text" id="documento" placeholder="Ingresa tu documento" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+                </div>
+                
+                <button type="submit" class="btn-checkin" style="width: 100%;">Confirmar Check-in</button>
+            </form>
+            <p id="mensajeCheckin" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
+    </div>
 
     <script src="../Js/Script.js"></script>
 

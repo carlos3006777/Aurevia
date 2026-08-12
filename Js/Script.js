@@ -206,7 +206,6 @@ if (formContacto) {
     });
 }
 
-// FAQ - ACCIONAR DESPLEGABLES
 const preguntasFaq = document.querySelectorAll('.faq-pregunta');
 preguntasFaq.forEach(pregunta => {
     pregunta.addEventListener('click', () => {
@@ -214,3 +213,30 @@ preguntasFaq.forEach(pregunta => {
         item.classList.toggle('activo');
     });
 });
+
+// FUNCIONES PARA EL MODAL DE CHECK-IN
+function abrirModalCheckin() {
+    const modal = document.getElementById('modal-checkin');
+    if (modal) modal.style.display = 'block';
+}
+
+function cerrarModalCheckin() {
+    const modal = document.getElementById('modal-checkin');
+    if (modal) modal.style.display = 'none';
+}
+
+function procesarCheckin(e) {
+    e.preventDefault();
+    const mensaje = document.getElementById('mensajeCheckin');
+    const codigo = document.getElementById('codigo_reserva').value;
+    
+    // Simulación de respuesta exitosa
+    mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;
+    mensaje.style.color = 'green';
+    
+    setTimeout(() => {
+        document.getElementById('formCheckin').reset();
+        mensaje.textContent = '';
+        cerrarModalCheckin();
+    }, 2500);
+}

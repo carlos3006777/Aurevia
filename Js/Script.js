@@ -30,18 +30,25 @@ if (formRegistro) {
                     correo, 
                     telefono, 
                     contrasena,
-                    password: contrasena // Se añade password por si el backend lo requiere así
+                    password: contrasena
                 })
             });
 
-            const data = await respuesta.json().catch(() => null);
+            // Intenta leer la respuesta como JSON o texto según el formato que envíe la API
+            let errorTexto = '';
+            try {
+                const data = await respuesta.json();
+                errorTexto = data.mensaje || data.error || data.detalle;
+            } catch {
+                errorTexto = await respuesta.text().catch(() => null);
+            }
 
             if (respuesta.ok) {
                 mensaje.textContent = 'Registro exitoso, ahora puedes iniciar sesión';
                 mensaje.style.color = 'green';
                 formRegistro.reset();
             } else {
-                mensaje.textContent = (data && data.mensaje) ? data.mensaje : 'Error en el registro. Revisa la consola (F12).';
+                mensaje.textContent = errorTexto || 'Error en el registro. Revisa la consola (F12).';
                 mensaje.style.color = 'red';
             }
         } catch (error) {
@@ -116,7 +123,6 @@ if (destinosGrid) {
         })
         .catch(error => {
             console.error('Error al cargar destinos de la API, cargando datos locales:', error);
-            // Carga respaldo local si falla la API
             cargarDestinosLocales();
         });
 }
@@ -236,10 +242,9 @@ function cerrarModalCheckin() {
 
 function procesarCheckin(e) {
     e.preventDefault();
-    const mensaje = document.getElementById('mensajeCheckin');
+    const mensaje = document.getElementById('mensajeCheckin'); // <-- Falta esta línea
     const codigo = document.getElementById('codigo_reserva').value;
     
-    // Simulación de respuesta exitosa
     mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;
     mensaje.style.color = 'green';
     

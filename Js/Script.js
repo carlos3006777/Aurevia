@@ -24,15 +24,24 @@ if (formRegistro) {
             const respuesta = await fetch(`${API_URL}/api/registro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, apellido, correo, telefono, contrasena })
+                body: JSON.stringify({ 
+                    nombre, 
+                    apellido, 
+                    correo, 
+                    telefono, 
+                    contrasena,
+                    password: contrasena // Se añade password por si el backend lo requiere así
+                })
             });
+
+            const data = await respuesta.json().catch(() => null);
 
             if (respuesta.ok) {
                 mensaje.textContent = 'Registro exitoso, ahora puedes iniciar sesión';
                 mensaje.style.color = 'green';
                 formRegistro.reset();
             } else {
-                mensaje.textContent = 'Error al registrar, intenta de nuevo';
+                mensaje.textContent = (data && data.mensaje) ? data.mensaje : 'Error en el registro. Revisa la consola (F12).';
                 mensaje.style.color = 'red';
             }
         } catch (error) {

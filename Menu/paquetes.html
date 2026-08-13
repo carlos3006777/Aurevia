@@ -39,15 +39,27 @@
         </section>
     </main>
 
-    <!-- Ventana Flotante (Modal) de Check-in -->
+    <!-- Ventana Flotante (Modal) de Check-in con Selección de Paquete -->
     <div id="modal-checkin" class="modal">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalCheckin()">&times;</span>
-            <h2>Check-in</h2>
+            <h2>Check-in de Paquete</h2>
             <form id="formCheckin" onsubmit="procesarCheckin(event)">
                 <div style="margin-bottom: 15px; text-align: left;">
                     <label for="codigo_reserva">Código de Reserva:</label>
                     <input type="text" id="codigo_reserva" placeholder="Ej: AUR-12345" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label for="paquete_select">Selecciona tu Paquete:</label>
+                    <select id="paquete_select" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+                        <option value="" disabled selected>Selecciona un paquete</option>
+                        <option value="Paquete París Soñado">Paquete París Soñado</option>
+                        <option value="Paquete Maldivas Relax">Paquete Maldivas Relax</option>
+                        <option value="Paquete Kyoto Cultural">Paquete Kyoto Cultural</option>
+                        <option value="Paquete Cancún Todo Incluido">Paquete Cancún Todo Incluido</option>
+                        <option value="Paquete Cusco Aventura">Paquete Cusco Aventura</option>
+                    </select>
                 </div>
                 
                 <div style="margin-bottom: 15px; text-align: left;">

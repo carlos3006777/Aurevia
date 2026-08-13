@@ -432,6 +432,7 @@ nav a:hover {
     align-items: center;
     text-align: center;
     position: relative;
+    overflow: hidden;
 }
 
 .equipo-card:hover, .tarjeta-equipo:hover {
@@ -439,26 +440,16 @@ nav a:hover {
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.avatar-container {
+.equipo-foto {
     width: 130px;
     height: 130px;
-    margin-bottom: 15px;
-}
-
-.equipo-foto, .avatar-container img {
-    width: 130px;
-    height: 130px;
+    min-width: 130px;
+    min-height: 130px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
-}
-
-.foto-pendiente-text {
-    font-size: 13px;
-    color: #666666;
-    margin-top: -10px;
-    margin-bottom: 10px;
-    font-weight: 500;
+    background-color: #e2e8f0;
+    display: block;
 }
 
 .equipo-card h3, .tarjeta-equipo h3 {

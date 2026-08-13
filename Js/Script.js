@@ -1,6 +1,6 @@
 const API_URL = 'https://aurevia-ye9a.onrender.com';
 
-// REGISTRO
+// REGISTRO DE USUARIO
 const formRegistro = document.getElementById('formRegistro');
 if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
@@ -34,7 +34,7 @@ if (formRegistro) {
                 })
             });
 
-            // Intenta leer la respuesta como JSON o texto según el formato que envíe la API
+            // Capturar la respuesta devuelta por el backend
             let errorTexto = '';
             try {
                 const data = await respuesta.json();
@@ -44,22 +44,22 @@ if (formRegistro) {
             }
 
             if (respuesta.ok) {
-                mensaje.textContent = 'Registro exitoso, ahora puedes iniciar sesión';
+                mensaje.textContent = '¡Registro exitoso! Ahora puedes iniciar sesión.';
                 mensaje.style.color = 'green';
                 formRegistro.reset();
             } else {
-                mensaje.textContent = errorTexto || 'Error en el registro. Revisa la consola (F12).';
+                mensaje.textContent = errorTexto || 'Error en el registro. Revisa los datos e intenta de nuevo.';
                 mensaje.style.color = 'red';
             }
         } catch (error) {
             mensaje.textContent = 'No se pudo conectar con el servidor';
             mensaje.style.color = 'red';
-            console.error(error);
+            console.error('Error en fetch registro:', error);
         }
     });
 }
 
-// LOGIN (CON VALIDACIÓN DE USUARIO NO ENCONTRADO)
+// LOGIN
 const formLogin = document.getElementById('formLogin');
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
@@ -92,12 +92,12 @@ if (formLogin) {
         } catch (error) {
             mensaje.textContent = 'No se pudo conectar con el servidor';
             mensaje.style.color = 'red';
-            console.error(error);
+            console.error('Error en fetch login:', error);
         }
     });
 }
 
-// MOSTRAR DESTINOS (CON HOVER Y CONSUMO DE API O LOCAL)
+// MOSTRAR DESTINOS
 const destinosGrid = document.getElementById('destinosGrid');
 if (destinosGrid) {
     fetch(`${API_URL}/api/destinos`)
@@ -216,11 +216,12 @@ if (formContacto) {
         } catch (error) {
             mensaje.textContent = 'No se pudo conectar con el servidor';
             mensaje.style.color = 'red';
-            console.error(error);
+            console.error('Error en contacto:', error);
         }
     });
 }
 
+// ACORDEÓN DE PREGUNTAS FRECUENTES (FAQ)
 const preguntasFaq = document.querySelectorAll('.faq-pregunta');
 preguntasFaq.forEach(pregunta => {
     pregunta.addEventListener('click', () => {
@@ -242,7 +243,7 @@ function cerrarModalCheckin() {
 
 function procesarCheckin(e) {
     e.preventDefault();
-    const mensaje = document.getElementById('mensajeCheckin'); // <-- Falta esta línea
+    const mensaje = document.getElementById('mensajeCheckin');
     const codigo = document.getElementById('codigo_reserva').value;
     
     mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;

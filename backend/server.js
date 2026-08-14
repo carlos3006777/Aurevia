@@ -125,3 +125,78 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
+// ============================================
+// NUEVOS ENDPOINTS: CRUD COMPLETO DE PAQUETES (Para Flutter/Web)
+// ============================================
+
+// CREAR PAQUETE (Ejecuta el Trigger de Auditoría en INSERT)
+app.post('/api/paquetes', async (req, res) => {
+    const { destino_id, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    try {
+        const resultado = await pool.query(
+            `INSERT INTO paquetes (destino_id, nombre, hotel, transporte, alimentacion, precio)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [destino_id, nombre, hotel, transporte, alimentacion, precio]
+        );
+        res.status(201).json(resultado.rows[0]);
+    } catch (error) {
+        console.error('ERROR:', error.message);
+        res.status(500).json({ error: 'Error al crear paquete' });
+    }
+});
+
+// ACTUALIZAR PAQUETE (Ejecuta el Trigger de Auditoría en UPDATE)
+app.put('/api/paquetes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { destino_id, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    try {
+        const resultado = await pool.query(
+            `UPDATE paquetes SET destino_id=$1, nombre=$2, hotel=$3, transporte=$4, alimentacion=$5, precio=$6
+             WHERE id=$7 RETURNING *`,
+            [destino_id, nombre, hotel, transporte, alimentacion, precio, id]
+        );
+        res.json(resultado.rows[0]);
+    } catch (error) {
+        console.error('ERROR:', error.message);
+        res.status(500).json({ error: 'Error al actualizar paquete' });
+    }
+});
+
+// ELIMINAR PAQUETE (Ejecuta el Trigger de Auditoría en DELETE)
+app.delete('/api/paquetes/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await pool.query('DELETE FROM paquetes WHERE id = $1', [id]);
+        res.json({ mensaje: 'Paquete eliminado correctamente' });
+    } catch (error) {
+        console.error('ERROR:', error.message);
+        res.status(500).json({ error: 'Error al eliminar paquete' });
+    }
+});
+
+// ============================================
+// CONSULTAR RESERVAS (MAESTRO-DETALLE) Y AUDITORÍA
+// ============================================
+
+// Obtener Reservas con datos del usuario y paquete (Usa Vista 2 con INNER JOIN)
+app.get('/api/reservas', async (req, res) => {
+    try {
+        const resultado = await pool.query('SELECT * FROM vista_reservas_detalladas');
+        res.json(resultado.rows);
+    } catch (error) {
+        console.error('ERROR:', error.message);
+        res.status(500).json({ error: 'Error al obtener reservas' });
+    }
+});
+
+// Obtener logs del Trigger de Auditoría
+app.get('/api/auditoria', async (req, res) => {
+    try {
+        const resultado = await pool.query('SELECT * FROM auditoria ORDER BY fecha_hora DESC');
+        res.json(resultado.rows);
+    } catch (error) {
+        console.error('ERROR:', error.message);
+        res.status(500).json({ error: 'Error al consultar auditoría' });
+    }
+});

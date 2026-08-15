@@ -14,10 +14,13 @@ const pool = new Pool({
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Auto-crear la columna destino_nombre en la base de datos si no existe
-pool.query('ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS destino_nombre VARCHAR(255);')
-    .then(() => console.log('Columna destino_nombre verificada correctamente.'))
-    .catch(err => console.error('Error al verificar columna destino_nombre:', err.message));
+// Auto-crear las columnas necesarias en la base de datos si no existen
+pool.query(`
+    ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS destino_nombre VARCHAR(255);
+    ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS check_in BOOLEAN DEFAULT false;
+`)
+    .then(() => console.log('Estructura de la tabla paquetes verificada correctamente.'))
+    .catch(err => console.error('Error al verificar columnas:', err.message));
 
 app.get('/', (req, res) => {
     res.send('Servidor de Aurevia funcionando correctamente');
@@ -132,14 +135,15 @@ app.post('/api/contacto', async (req, res) => {
 
 // CREAR PAQUETE
 app.post('/api/paquetes', async (req, res) => {
-    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio, check_in, checkIn } = req.body;
     const nombreDestinoFinal = destino_nombre || destino || null;
+    const checkInFinal = check_in ?? checkIn ?? false;
 
     try {
         const resultado = await pool.query(
-            `INSERT INTO paquetes (destino_id, destino_nombre, nombre, hotel, transporte, alimentacion, precio)
-             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio]
+            `INSERT INTO paquetes (destino_id, destino_nombre, nombre, hotel, transporte, alimentacion, precio, check_in)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio, checkInFinal]
         );
         res.status(201).json(resultado.rows[0]);
     } catch (error) {
@@ -148,18 +152,36 @@ app.post('/api/paquetes', async (req, res) => {
     }
 });
 
-// ACTUALIZAR PAQUETE
+// ACTUALIZAR PAQUETE (Soporta actualización de Check-in)
 app.put('/api/paquetes/:id', async (req, res) => {
     const { id } = req.params;
-    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio, check_in, checkIn } = req.body;
     const nombreDestinoFinal = destino_nombre || destino || null;
+    const checkInValor = check_in ?? checkIn;
 
     try {
         const resultado = await pool.query(
             `UPDATE paquetes 
-             SET destino_id=$1, destino_nombre=$2, nombre=$3, hotel=$4, transporte=$5, alimentacion=$6, precio=$7
-             WHERE id=$8 RETURNING *`,
-            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio, id]
+             SET destino_id = COALESCE($1, destino_id), 
+                 destino_nombre = COALESCE($2, destino_nombre), 
+                 nombre = COALESCE($3, nombre), 
+                 hotel = COALESCE($4, hotel), 
+                 transporte = COALESCE($5, transporte), 
+                 alimentacion = COALESCE($6, alimentacion), 
+                 precio = COALESCE($7, precio), 
+                 check_in = COALESCE($8, check_in)
+             WHERE id = $9 RETURNING *`,
+            [
+                destino_id || null, 
+                nombreDestinoFinal, 
+                nombre || null, 
+                hotel || null, 
+                transporte || null, 
+                alimentacion || null, 
+                precio || null, 
+                checkInValor ?? null, 
+                id
+            ]
         );
         res.json(resultado.rows[0]);
     } catch (error) {

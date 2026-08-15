@@ -34,7 +34,6 @@ if (formRegistro) {
                 })
             });
 
-            // Capturar la respuesta devuelta por el backend
             let errorTexto = '';
             try {
                 const data = await respuesta.json();
@@ -250,7 +249,6 @@ async function abrirModalCheckin() {
                 const option = document.createElement('option');
                 option.value = paquete.id;
                 option.textContent = paquete.nombre;
-                option.dataset.paquete = JSON.stringify(paquete);
                 selectPaquetes.appendChild(option);
             });
         } catch (error) {
@@ -269,8 +267,6 @@ async function procesarCheckin(e) {
     if (e) e.preventDefault();
     const mensaje = document.getElementById('mensajeCheckin') || document.getElementById('mensaje');
     const selectPaquetes = document.getElementById('paquete_select') || document.getElementById('paqueteSelect');
-    const inputCodigo = document.getElementById('codigo_reserva');
-    const codigo = inputCodigo ? inputCodigo.value : 'Confirmado';
 
     if (!selectPaquetes || !selectPaquetes.value) {
         if (mensaje) {
@@ -280,33 +276,24 @@ async function procesarCheckin(e) {
         return;
     }
 
-    const opcionSeleccionada = selectPaquetes.options[selectPaquetes.selectedIndex];
-    let paquete = {};
-    
-    try {
-        paquete = JSON.parse(opcionSeleccionada.dataset.paquete);
-    } catch (err) {
-        paquete = { id: selectPaquetes.value };
-    }
-
     if (mensaje) {
         mensaje.textContent = 'Procesando check-in...';
         mensaje.style.color = 'black';
     }
 
     try {
+        // Enviar UNICAMENTE el booleano true para forzar la actualizacion limpia en la BD
         const respuesta = await fetch(`${API_URL}/api/paquetes/${selectPaquetes.value}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                ...paquete,
                 check_in: true
             })
         });
 
         if (respuesta.ok) {
             if (mensaje) {
-                mensaje.textContent = `¡Check-in realizado con éxito!`;
+                mensaje.textContent = '¡Check-in realizado con éxito!';
                 mensaje.style.color = 'green';
             }
 

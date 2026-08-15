@@ -156,7 +156,7 @@ function cargarDestinosLocales() {
     });
 }
 
-// MOSTRAR PAQUETES
+// MOSTRAR PAQUETES EN LA PÁGINA
 const paquetesGrid = document.getElementById('paquetesGrid');
 if (paquetesGrid) {
     fetch(`${API_URL}/api/paquetes`)
@@ -231,9 +231,33 @@ preguntasFaq.forEach(pregunta => {
 });
 
 // FUNCIONES PARA EL MODAL DE CHECK-IN
-function abrirModalCheckin() {
+async function abrirModalCheckin() {
     const modal = document.getElementById('modal-checkin');
+    const selectPaquetes = document.getElementById('paquete_select');
+
     if (modal) modal.style.display = 'block';
+
+    // Cargar la lista dinámicamente desde la API
+    if (selectPaquetes) {
+        try {
+            selectPaquetes.innerHTML = '<option value="" disabled selected>Cargando paquetes...</option>';
+
+            const respuesta = await fetch(`${API_URL}/api/paquetes`);
+            const paquetes = await respuesta.json();
+
+            selectPaquetes.innerHTML = '<option value="" disabled selected>Selecciona un paquete</option>';
+
+            paquetes.forEach(paquete => {
+                const option = document.createElement('option');
+                option.value = paquete.nombre;
+                option.textContent = paquete.nombre;
+                selectPaquetes.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar paquetes en el check-in:', error);
+            selectPaquetes.innerHTML = '<option value="" disabled selected>Error al cargar la lista</option>';
+        }
+    }
 }
 
 function cerrarModalCheckin() {

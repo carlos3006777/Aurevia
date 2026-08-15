@@ -152,12 +152,14 @@ app.post('/api/paquetes', async (req, res) => {
     }
 });
 
-// ACTUALIZAR PAQUETE (Soporta actualización de Check-in)
+// ACTUALIZAR PAQUETE (Soporta actualización limpia de Check-in)
 app.put('/api/paquetes/:id', async (req, res) => {
     const { id } = req.params;
     const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio, check_in, checkIn } = req.body;
     const nombreDestinoFinal = destino_nombre || destino || null;
-    const checkInValor = check_in ?? checkIn;
+    
+    // Captura explícitamente el valor booleano recibido o mantén undefined
+    const checkInValor = (check_in !== undefined) ? check_in : ((checkIn !== undefined) ? checkIn : true);
 
     try {
         const resultado = await pool.query(
@@ -169,7 +171,7 @@ app.put('/api/paquetes/:id', async (req, res) => {
                  transporte = COALESCE($5, transporte), 
                  alimentacion = COALESCE($6, alimentacion), 
                  precio = COALESCE($7, precio), 
-                 check_in = COALESCE($8, check_in)
+                 check_in = $8
              WHERE id = $9 RETURNING *`,
             [
                 destino_id || null, 
@@ -179,10 +181,15 @@ app.put('/api/paquetes/:id', async (req, res) => {
                 transporte || null, 
                 alimentacion || null, 
                 precio || null, 
-                checkInValor ?? null, 
+                checkInValor, 
                 id
             ]
         );
+
+        if (resultado.rowCount === 0) {
+            return res.status(404).json({ error: 'Paquete no encontrado' });
+        }
+
         res.json(resultado.rows[0]);
     } catch (error) {
         console.error('ERROR:', error.message);

@@ -169,10 +169,10 @@ if (paquetesGrid) {
                 card.innerHTML = `
                     <div class="destino-card-info">
                         <h3>${paquete.nombre}</h3>
-                        <p>${paquete.destino_nombre}</p>
-                        <p>🏨 ${paquete.hotel}</p>
-                        <p>✈️ ${paquete.transporte}</p>
-                        <p>🍽️ ${paquete.alimentacion}</p>
+                        <p>${paquete.destino_nombre || ''}</p>
+                        <p>🏨 ${paquete.hotel || ''}</p>
+                        <p>✈️ ${paquete.transporte || ''}</p>
+                        <p>🍽️ ${paquete.alimentacion || ''}</p>
                         <p class="destino-card-precio">$${paquete.precio}</p>
                     </div>
                 `;
@@ -232,8 +232,8 @@ preguntasFaq.forEach(pregunta => {
 
 // FUNCIONES PARA EL MODAL DE CHECK-IN
 async function abrirModalCheckin() {
-    const modal = document.getElementById('modal-checkin');
-    const selectPaquetes = document.getElementById('paquete_select');
+    const modal = document.getElementById('modal-checkin') || document.getElementById('modalCheckIn');
+    const selectPaquetes = document.getElementById('paquete_select') || document.getElementById('paqueteSelect');
 
     if (modal) modal.style.display = 'block';
 
@@ -250,7 +250,6 @@ async function abrirModalCheckin() {
                 const option = document.createElement('option');
                 option.value = paquete.id;
                 option.textContent = paquete.nombre;
-                // Guardamos el objeto entero en data-json para usarlo en la peticion PUT
                 option.dataset.paquete = JSON.stringify(paquete);
                 selectPaquetes.appendChild(option);
             });
@@ -262,30 +261,41 @@ async function abrirModalCheckin() {
 }
 
 function cerrarModalCheckin() {
-    const modal = document.getElementById('modal-checkin');
+    const modal = document.getElementById('modal-checkin') || document.getElementById('modalCheckIn');
     if (modal) modal.style.display = 'none';
 }
 
 async function procesarCheckin(e) {
-    e.preventDefault();
-    const mensaje = document.getElementById('mensajeCheckin');
-    const selectPaquetes = document.getElementById('paquete_select');
-    const codigo = document.getElementById('codigo_reserva').value;
+    if (e) e.preventDefault();
+    const mensaje = document.getElementById('mensajeCheckin') || document.getElementById('mensaje');
+    const selectPaquetes = document.getElementById('paquete_select') || document.getElementById('paqueteSelect');
+    const inputCodigo = document.getElementById('codigo_reserva');
+    const codigo = inputCodigo ? inputCodigo.value : 'Confirmado';
 
-    if (!selectPaquetes.value) {
-        mensaje.textContent = 'Por favor selecciona un paquete';
-        mensaje.style.color = 'red';
+    if (!selectPaquetes || !selectPaquetes.value) {
+        if (mensaje) {
+            mensaje.textContent = 'Por favor selecciona un paquete';
+            mensaje.style.color = 'red';
+        }
         return;
     }
 
     const opcionSeleccionada = selectPaquetes.options[selectPaquetes.selectedIndex];
-    const paquete = JSON.parse(opcionSeleccionada.dataset.paquete);
+    let paquete = {};
+    
+    try {
+        paquete = JSON.parse(opcionSeleccionada.dataset.paquete);
+    } catch (err) {
+        paquete = { id: selectPaquetes.value };
+    }
 
-    mensaje.textContent = 'Procesando check-in...';
-    mensaje.style.color = 'black';
+    if (mensaje) {
+        mensaje.textContent = 'Procesando check-in...';
+        mensaje.style.color = 'black';
+    }
 
     try {
-        const respuesta = await fetch(`${API_URL}/api/paquetes/${paquete.id}`, {
+        const respuesta = await fetch(`${API_URL}/api/paquetes/${selectPaquetes.value}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -295,21 +305,34 @@ async function procesarCheckin(e) {
         });
 
         if (respuesta.ok) {
-            mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;
-            mensaje.style.color = 'green';
+            if (mensaje) {
+                mensaje.textContent = `¡Check-in realizado con éxito!`;
+                mensaje.style.color = 'green';
+            }
 
             setTimeout(() => {
-                document.getElementById('formCheckin').reset();
-                mensaje.textContent = '';
+                const formCheckin = document.getElementById('formCheckin');
+                if (formCheckin) formCheckin.reset();
+                if (mensaje) mensaje.textContent = '';
                 cerrarModalCheckin();
-            }, 2500);
+            }, 2000);
         } else {
-            mensaje.textContent = 'Error al actualizar el check-in en el servidor';
-            mensaje.style.color = 'red';
+            if (mensaje) {
+                mensaje.textContent = 'Error al actualizar el check-in en el servidor';
+                mensaje.style.color = 'red';
+            }
         }
     } catch (error) {
         console.error('Error en procesarCheckin:', error);
-        mensaje.textContent = 'Error de conexión con el servidor';
-        mensaje.style.color = 'red';
+        if (mensaje) {
+            mensaje.textContent = 'Error de conexión con el servidor';
+            mensaje.style.color = 'red';
+        }
     }
+}
+
+// VINCULAR EVENTO DE SUBMIT AL FORMULARIO DE CHECK-IN AUTOMÁTICAMENTE
+const formCheckin = document.getElementById('formCheckin');
+if (formCheckin) {
+    formCheckin.addEventListener('submit', procesarCheckin);
 }

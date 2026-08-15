@@ -14,6 +14,11 @@ const pool = new Pool({
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
+// Auto-crear la columna destino_nombre en la base de datos si no existe
+pool.query('ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS destino_nombre VARCHAR(255);')
+    .then(() => console.log('Columna destino_nombre verificada correctamente.'))
+    .catch(err => console.error('Error al verificar columna destino_nombre:', err.message));
+
 app.get('/', (req, res) => {
     res.send('Servidor de Aurevia funcionando correctamente');
 });
@@ -29,13 +34,16 @@ app.get('/api/destinos', async (req, res) => {
     }
 });
 
-// OBTENER PAQUETES
+// OBTENER PAQUETES (Prioriza destino_nombre tipeado a mano)
 app.get('/api/paquetes', async (req, res) => {
     try {
         const resultado = await pool.query(`
-            SELECT paquetes.*, destinos.nombre AS destino_nombre
+            SELECT 
+                paquetes.*, 
+                COALESCE(paquetes.destino_nombre, destinos.nombre, 'Sin destino') AS destino_nombre
             FROM paquetes
-            JOIN destinos ON paquetes.destino_id = destinos.id
+            LEFT JOIN destinos ON paquetes.destino_id = destinos.id
+            ORDER BY paquetes.id DESC
         `);
         res.json(resultado.rows);
     } catch (error) {
@@ -68,7 +76,6 @@ app.post('/api/registro', async (req, res) => {
     } catch (error) {
         console.error('ERROR:', error.message);
 
-        // Error cuando el correo ya existe en la BD (llave duplicada en UNIQUE)
         if (error.code === '23505') {
             return res.status(400).json({ mensaje: 'El correo electrónico ya está registrado.' });
         }
@@ -91,7 +98,6 @@ app.post('/api/login', async (req, res) => {
         if (resultado.rows.length > 0) {
             res.status(200).json({ mensaje: 'Login exitoso', usuario: resultado.rows[0] });
         } else {
-            // Verificar si el correo ni siquiera existe
             const existeUsuario = await pool.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
             if (existeUsuario.rows.length === 0) {
                 return res.status(404).json({ mensaje: 'Usuario no encontrado' });
@@ -120,24 +126,20 @@ app.post('/api/contacto', async (req, res) => {
     }
 });
 
-// Usar el puerto que asigna Render automáticamente
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
-
 // ============================================
-// NUEVOS ENDPOINTS: CRUD COMPLETO DE PAQUETES (Para Flutter/Web)
+// CRUD COMPLETO DE PAQUETES (Para Flutter/Web)
 // ============================================
 
-// CREAR PAQUETE (Ejecuta el Trigger de Auditoría en INSERT)
+// CREAR PAQUETE
 app.post('/api/paquetes', async (req, res) => {
-    const { destino_id, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const nombreDestinoFinal = destino_nombre || destino || null;
+
     try {
         const resultado = await pool.query(
-            `INSERT INTO paquetes (destino_id, nombre, hotel, transporte, alimentacion, precio)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [destino_id, nombre, hotel, transporte, alimentacion, precio]
+            `INSERT INTO paquetes (destino_id, destino_nombre, nombre, hotel, transporte, alimentacion, precio)
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio]
         );
         res.status(201).json(resultado.rows[0]);
     } catch (error) {
@@ -146,15 +148,18 @@ app.post('/api/paquetes', async (req, res) => {
     }
 });
 
-// ACTUALIZAR PAQUETE (Ejecuta el Trigger de Auditoría en UPDATE)
+// ACTUALIZAR PAQUETE
 app.put('/api/paquetes/:id', async (req, res) => {
     const { id } = req.params;
-    const { destino_id, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio } = req.body;
+    const nombreDestinoFinal = destino_nombre || destino || null;
+
     try {
         const resultado = await pool.query(
-            `UPDATE paquetes SET destino_id=$1, nombre=$2, hotel=$3, transporte=$4, alimentacion=$5, precio=$6
-             WHERE id=$7 RETURNING *`,
-            [destino_id, nombre, hotel, transporte, alimentacion, precio, id]
+            `UPDATE paquetes 
+             SET destino_id=$1, destino_nombre=$2, nombre=$3, hotel=$4, transporte=$5, alimentacion=$6, precio=$7
+             WHERE id=$8 RETURNING *`,
+            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio, id]
         );
         res.json(resultado.rows[0]);
     } catch (error) {
@@ -163,7 +168,7 @@ app.put('/api/paquetes/:id', async (req, res) => {
     }
 });
 
-// ELIMINAR PAQUETE (Ejecuta el Trigger de Auditoría en DELETE)
+// ELIMINAR PAQUETE
 app.delete('/api/paquetes/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -176,10 +181,9 @@ app.delete('/api/paquetes/:id', async (req, res) => {
 });
 
 // ============================================
-// CONSULTAR RESERVAS (MAESTRO-DETALLE) Y AUDITORÍA
+// CONSULTAR RESERVAS Y AUDITORÍA
 // ============================================
 
-// Obtener Reservas con datos del usuario y paquete (Usa Vista 2 con INNER JOIN)
 app.get('/api/reservas', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT * FROM vista_reservas_detalladas');
@@ -190,7 +194,6 @@ app.get('/api/reservas', async (req, res) => {
     }
 });
 
-// Obtener logs del Trigger de Auditoría
 app.get('/api/auditoria', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT * FROM auditoria ORDER BY fecha_hora DESC');
@@ -199,4 +202,9 @@ app.get('/api/auditoria', async (req, res) => {
         console.error('ERROR:', error.message);
         res.status(500).json({ error: 'Error al consultar auditoría' });
     }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

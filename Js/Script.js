@@ -6,17 +6,19 @@ if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const nombre = document.getElementById('nombre').value;
-        const apellido = document.getElementById('apellido').value;
-        const correo = document.getElementById('correo').value;
-        const telefono = document.getElementById('telefono').value;
-        const contrasena = document.getElementById('contrasena').value;
-        const confirmar = document.getElementById('confirmar').value;
+        const nombre = document.getElementById('nombre')?.value;
+        const apellido = document.getElementById('apellido')?.value;
+        const correo = document.getElementById('correo')?.value;
+        const telefono = document.getElementById('telefono')?.value;
+        const contrasena = document.getElementById('contrasena')?.value;
+        const confirmar = document.getElementById('confirmar')?.value;
         const mensaje = document.getElementById('mensaje');
 
         if (contrasena !== confirmar) {
-            mensaje.textContent = 'Las contraseñas no coinciden';
-            mensaje.style.color = 'red';
+            if (mensaje) {
+                mensaje.textContent = 'Las contraseñas no coinciden';
+                mensaje.style.color = 'red';
+            }
             return;
         }
 
@@ -43,16 +45,22 @@ if (formRegistro) {
             }
 
             if (respuesta.ok) {
-                mensaje.textContent = '¡Registro exitoso! Ahora puedes iniciar sesión.';
-                mensaje.style.color = 'green';
+                if (mensaje) {
+                    mensaje.textContent = '¡Registro exitoso! Ahora puedes iniciar sesión.';
+                    mensaje.style.color = 'green';
+                }
                 formRegistro.reset();
             } else {
-                mensaje.textContent = errorTexto || 'Error en el registro. Revisa los datos e intenta de nuevo.';
-                mensaje.style.color = 'red';
+                if (mensaje) {
+                    mensaje.textContent = errorTexto || 'Error en el registro. Revisa los datos e intenta de nuevo.';
+                    mensaje.style.color = 'red';
+                }
             }
         } catch (error) {
-            mensaje.textContent = 'No se pudo conectar con el servidor';
-            mensaje.style.color = 'red';
+            if (mensaje) {
+                mensaje.textContent = 'No se pudo conectar con el servidor';
+                mensaje.style.color = 'red';
+            }
             console.error('Error en fetch registro:', error);
         }
     });
@@ -64,8 +72,8 @@ if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const correo = document.getElementById('correo').value;
-        const contrasena = document.getElementById('contrasena').value;
+        const correo = document.getElementById('correo')?.value;
+        const contrasena = document.getElementById('contrasena')?.value;
         const mensaje = document.getElementById('mensaje');
 
         try {
@@ -76,21 +84,29 @@ if (formLogin) {
             });
 
             if (respuesta.ok) {
-                mensaje.textContent = 'Bienvenido/a a Aurevia';
-                mensaje.style.color = 'green';
+                if (mensaje) {
+                    mensaje.textContent = 'Bienvenido/a a Aurevia';
+                    mensaje.style.color = 'green';
+                }
                 setTimeout(() => {
                     window.location.href = '../index.html';
                 }, 1500);
             } else if (respuesta.status === 404) {
-                mensaje.innerHTML = 'Usuario no encontrado. <a href="sign_up.html" style="color: blue; text-decoration: underline;">Regístrate aquí</a>';
-                mensaje.style.color = 'red';
+                if (mensaje) {
+                    mensaje.innerHTML = 'Usuario no encontrado. <a href="sign_up.html" style="color: blue; text-decoration: underline;">Regístrate aquí</a>';
+                    mensaje.style.color = 'red';
+                }
             } else {
-                mensaje.textContent = 'Correo o contraseña incorrectos';
-                mensaje.style.color = 'red';
+                if (mensaje) {
+                    mensaje.textContent = 'Correo o contraseña incorrectos';
+                    mensaje.style.color = 'red';
+                }
             }
         } catch (error) {
-            mensaje.textContent = 'No se pudo conectar con el servidor';
-            mensaje.style.color = 'red';
+            if (mensaje) {
+                mensaje.textContent = 'No se pudo conectar con el servidor';
+                mensaje.style.color = 'red';
+            }
             console.error('Error en fetch login:', error);
         }
     });
@@ -136,6 +152,7 @@ function cargarDestinosLocales() {
         { nombre: "Cusco", pais: "Perú", dias: 7, precio: "799.00", imagen: "../img/cusco.jpg", descripcion: "Explora la cuna del imperio inca y visita la maravilla del mundo Machu Picchu." }
     ];
 
+    if (!destinosGrid) return;
     destinosGrid.innerHTML = "";
     destinosLocales.forEach(destino => {
         destinosGrid.innerHTML += `
@@ -190,11 +207,11 @@ if (formContacto) {
     formContacto.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const nombre = document.getElementById('nombre').value;
-        const correo = document.getElementById('correo').value;
-        const telefono = document.getElementById('telefono').value;
-        const destino_interes = document.getElementById('destino_interes').value;
-        const mensaje_texto = document.getElementById('mensaje_texto').value;
+        const nombre = document.getElementById('nombre')?.value;
+        const correo = document.getElementById('correo')?.value;
+        const telefono = document.getElementById('telefono')?.value;
+        const destino_interes = document.getElementById('destino_interes')?.value;
+        const mensaje_texto = document.getElementById('mensaje_texto')?.value;
         const mensaje = document.getElementById('mensaje');
 
         try {
@@ -205,16 +222,22 @@ if (formContacto) {
             });
 
             if (respuesta.ok) {
-                mensaje.textContent = 'Mensaje enviado correctamente, te contactaremos pronto';
-                mensaje.style.color = 'green';
+                if (mensaje) {
+                    mensaje.textContent = 'Mensaje enviado correctamente, te contactaremos pronto';
+                    mensaje.style.color = 'green';
+                }
                 formContacto.reset();
             } else {
-                mensaje.textContent = 'Error al enviar el mensaje, intenta de nuevo';
-                mensaje.style.color = 'red';
+                if (mensaje) {
+                    mensaje.textContent = 'Error al enviar el mensaje, intenta de nuevo';
+                    mensaje.style.color = 'red';
+                }
             }
         } catch (error) {
-            mensaje.textContent = 'No se pudo conectar con el servidor';
-            mensaje.style.color = 'red';
+            if (mensaje) {
+                mensaje.textContent = 'No se pudo conectar con el servidor';
+                mensaje.style.color = 'red';
+            }
             console.error('Error en contacto:', error);
         }
     });
@@ -230,9 +253,18 @@ preguntasFaq.forEach(pregunta => {
 });
 
 // FUNCIONES PARA EL MODAL DE CHECK-IN
+function obtenerSelectPaquete() {
+    return document.getElementById('selectPaquete') || 
+           document.getElementById('paquete_select') || 
+           document.getElementById('paqueteSelect') || 
+           document.querySelector('#modal-checkin select') || 
+           document.querySelector('#modalCheckIn select') ||
+           document.querySelector('form select');
+}
+
 async function abrirModalCheckin() {
     const modal = document.getElementById('modal-checkin') || document.getElementById('modalCheckIn');
-    const selectPaquetes = document.getElementById('paquete_select') || document.getElementById('paqueteSelect');
+    const selectPaquetes = obtenerSelectPaquete();
 
     if (modal) modal.style.display = 'block';
 
@@ -243,7 +275,7 @@ async function abrirModalCheckin() {
             const respuesta = await fetch(`${API_URL}/api/paquetes`);
             const paquetes = await respuesta.json();
 
-            selectPaquetes.innerHTML = '<option value="" disabled selected>Selecciona un paquete</option>';
+            selectPaquetes.innerHTML = '<option value="" disabled selected>Selecciona tu Paquete</option>';
 
             paquetes.forEach(paquete => {
                 const option = document.createElement('option');
@@ -265,16 +297,19 @@ function cerrarModalCheckin() {
 
 async function procesarCheckin(e) {
     if (e) e.preventDefault();
+    
     const mensaje = document.getElementById('mensajeCheckin') || document.getElementById('mensaje');
-    const selectPaquetes = document.getElementById('paquete_select') || document.getElementById('paqueteSelect');
+    const selectPaquetes = obtenerSelectPaquete();
 
     if (!selectPaquetes || !selectPaquetes.value) {
         if (mensaje) {
-            mensaje.textContent = 'Por favor selecciona un paquete';
+            mensaje.textContent = 'Por favor selecciona un paquete válido';
             mensaje.style.color = 'red';
         }
         return;
     }
+
+    const idPaqueteSeleccionado = selectPaquetes.value;
 
     if (mensaje) {
         mensaje.textContent = 'Procesando check-in...';
@@ -282,8 +317,7 @@ async function procesarCheckin(e) {
     }
 
     try {
-        // Enviar UNICAMENTE el booleano true para forzar la actualizacion limpia en la BD
-        const respuesta = await fetch(`${API_URL}/api/paquetes/${selectPaquetes.value}`, {
+        const respuesta = await fetch(`${API_URL}/api/paquetes/${idPaqueteSeleccionado}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -292,13 +326,14 @@ async function procesarCheckin(e) {
         });
 
         if (respuesta.ok) {
+            const numReserva = document.getElementById('codigo_reserva')?.value || document.querySelector('input[type="text"]')?.value || 'solicitada';
             if (mensaje) {
-                mensaje.textContent = '¡Check-in realizado con éxito!';
+                mensaje.textContent = `¡Check-in realizado con éxito!`;
                 mensaje.style.color = 'green';
             }
 
             setTimeout(() => {
-                const formCheckin = document.getElementById('formCheckin');
+                const formCheckin = document.getElementById('formCheckin') || document.querySelector('form');
                 if (formCheckin) formCheckin.reset();
                 if (mensaje) mensaje.textContent = '';
                 cerrarModalCheckin();
@@ -319,7 +354,7 @@ async function procesarCheckin(e) {
 }
 
 // VINCULAR EVENTO DE SUBMIT AL FORMULARIO DE CHECK-IN AUTOMÁTICAMENTE
-const formCheckin = document.getElementById('formCheckin');
+const formCheckin = document.getElementById('formCheckin') || document.querySelector('#modal-checkin form');
 if (formCheckin) {
     formCheckin.addEventListener('submit', procesarCheckin);
 }

@@ -237,7 +237,6 @@ async function abrirModalCheckin() {
 
     if (modal) modal.style.display = 'block';
 
-    // Cargar la lista dinámicamente desde la API
     if (selectPaquetes) {
         try {
             selectPaquetes.innerHTML = '<option value="" disabled selected>Cargando paquetes...</option>';
@@ -249,8 +248,10 @@ async function abrirModalCheckin() {
 
             paquetes.forEach(paquete => {
                 const option = document.createElement('option');
-                option.value = paquete.nombre;
+                option.value = paquete.id;
                 option.textContent = paquete.nombre;
+                // Guardamos el objeto entero en data-json para usarlo en la peticion PUT
+                option.dataset.paquete = JSON.stringify(paquete);
                 selectPaquetes.appendChild(option);
             });
         } catch (error) {
@@ -265,17 +266,50 @@ function cerrarModalCheckin() {
     if (modal) modal.style.display = 'none';
 }
 
-function procesarCheckin(e) {
+async function procesarCheckin(e) {
     e.preventDefault();
     const mensaje = document.getElementById('mensajeCheckin');
+    const selectPaquetes = document.getElementById('paquete_select');
     const codigo = document.getElementById('codigo_reserva').value;
-    
-    mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;
-    mensaje.style.color = 'green';
-    
-    setTimeout(() => {
-        document.getElementById('formCheckin').reset();
-        mensaje.textContent = '';
-        cerrarModalCheckin();
-    }, 2500);
+
+    if (!selectPaquetes.value) {
+        mensaje.textContent = 'Por favor selecciona un paquete';
+        mensaje.style.color = 'red';
+        return;
+    }
+
+    const opcionSeleccionada = selectPaquetes.options[selectPaquetes.selectedIndex];
+    const paquete = JSON.parse(opcionSeleccionada.dataset.paquete);
+
+    mensaje.textContent = 'Procesando check-in...';
+    mensaje.style.color = 'black';
+
+    try {
+        const respuesta = await fetch(`${API_URL}/api/paquetes/${paquete.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ...paquete,
+                check_in: true
+            })
+        });
+
+        if (respuesta.ok) {
+            mensaje.textContent = `¡Check-in realizado con éxito para la reserva ${codigo}!`;
+            mensaje.style.color = 'green';
+
+            setTimeout(() => {
+                document.getElementById('formCheckin').reset();
+                mensaje.textContent = '';
+                cerrarModalCheckin();
+            }, 2500);
+        } else {
+            mensaje.textContent = 'Error al actualizar el check-in en el servidor';
+            mensaje.style.color = 'red';
+        }
+    } catch (error) {
+        console.error('Error en procesarCheckin:', error);
+        mensaje.textContent = 'Error de conexión con el servidor';
+        mensaje.style.color = 'red';
+    }
 }

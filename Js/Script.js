@@ -1,4 +1,4 @@
-const API_URL = 'https://aurevia-ye9a.onrender.com';
+const API_URL = 'https://aurevia-1.onrender.com';
 
 // REGISTRO DE USUARIO
 const formRegistro = document.getElementById('formRegistro');

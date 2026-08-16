@@ -40,11 +40,11 @@
     </main>
 
     <!-- Ventana Flotante (Modal) de Check-in con Selección de Paquete -->
-    <div id="modal-checkin" class="modal">
+    <div id="modal-checkin" class="modal" style="display: none;">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalCheckin()">&times;</span>
             <h2>Check-in de Paquete</h2>
-            <form id="formCheckin" onsubmit="procesarCheckin(event)">
+            <form id="formCheckin">
                 <div style="margin-bottom: 15px; text-align: left;">
                     <label for="codigo_reserva">Código de Reserva:</label>
                     <input type="text" id="codigo_reserva" placeholder="Ej: AUR-12345" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
@@ -54,7 +54,6 @@
                     <label for="paquete_select">Selecciona tu Paquete:</label>
                     <select id="paquete_select" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
                         <option value="" disabled selected>Cargando paquetes...</option>
-                        <!-- Las opciones se generarán dinámicamente desde PostgreSQL -->
                     </select>
                 </div>
                 

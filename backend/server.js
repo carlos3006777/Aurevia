@@ -18,8 +18,9 @@ const pool = new Pool({
 pool.query(`
     ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS destino_nombre VARCHAR(255);
     ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS check_in BOOLEAN DEFAULT false;
+    ALTER TABLE reservas ADD COLUMN IF NOT EXISTS monto_total NUMERIC(10,2);
 `)
-    .then(() => console.log('Estructura de la tabla paquetes verificada correctamente.'))
+    .then(() => console.log('Estructura de la base de datos verificada correctamente.'))
     .catch(err => console.error('Error al verificar columnas:', err.message));
 
 app.get('/', (req, res) => {
@@ -130,7 +131,7 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CREAR RESERVA (ACTUALIZADO CON MANEJO DE USUARIO Y PRECIO)
+// CREAR RESERVA (CON FALLBACK DE COLUMNAS MONTO_TOTAL / TOTAL)
 // ============================================
 app.post('/api/reservas', async (req, res) => {
     const { usuario_id, paquete_id, precio } = req.body;
@@ -158,12 +159,21 @@ app.post('/api/reservas', async (req, res) => {
         // 2. Limpiar el formato del precio a número flotante
         const precioLimpio = parseFloat(String(precio).replace(/[^0-9.]/g, '')) || 0;
 
-        // 3. Crear registro maestro en reservas
-        const nuevaReserva = await pool.query(
-            'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
-            [clienteId, precioLimpio]
-        );
-        const reservaId = nuevaReserva.rows[0].id;
+        // 3. Crear registro maestro en reservas (monto_total o total según tu BD)
+        let reservaId;
+        try {
+            const nuevaReserva = await pool.query(
+                'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
+                [clienteId, precioLimpio]
+            );
+            reservaId = nuevaReserva.rows[0].id;
+        } catch (errCol) {
+            const nuevaReserva = await pool.query(
+                'INSERT INTO reservas (usuario_id, total) VALUES ($1, $2) RETURNING id',
+                [clienteId, precioLimpio]
+            );
+            reservaId = nuevaReserva.rows[0].id;
+        }
 
         // 4. Crear detalle de la reserva
         await pool.query(

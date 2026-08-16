@@ -131,10 +131,10 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CREAR RESERVA (CON FALLBACK DE COLUMNAS MONTO_TOTAL / TOTAL)
+// CREAR RESERVA (CON CANTIDAD DE PERSONAS Y MANEJO ROBUSTO)
 // ============================================
 app.post('/api/reservas', async (req, res) => {
-    const { usuario_id, paquete_id, precio } = req.body;
+    const { usuario_id, paquete_id, precio, cantidad_personas } = req.body;
 
     if (!paquete_id || !precio) {
         return res.status(400).json({ error: 'Faltan datos requeridos para la reserva' });
@@ -143,10 +143,9 @@ app.post('/api/reservas', async (req, res) => {
     try {
         let clienteId = usuario_id || 1;
 
-        // 1. Verificar si el usuario existe en la BD
+        // 1. Verificar si el usuario existe o crear uno por defecto
         const usuarioExiste = await pool.query('SELECT id FROM usuarios WHERE id = $1', [clienteId]);
         
-        // Si no existe el usuario (por ejemplo id = 1), creamos uno por defecto
         if (usuarioExiste.rows.length === 0) {
             const nuevoUsuario = await pool.query(`
                 INSERT INTO usuarios (nombre, apellido, correo, contrasena) 
@@ -156,10 +155,11 @@ app.post('/api/reservas', async (req, res) => {
             clienteId = nuevoUsuario.rows[0].id;
         }
 
-        // 2. Limpiar el formato del precio a número flotante
+        // 2. Limpiar el precio y definir cantidad de personas (1 por defecto)
         const precioLimpio = parseFloat(String(precio).replace(/[^0-9.]/g, '')) || 0;
+        const personas = parseInt(cantidad_personas) || 1;
 
-        // 3. Crear registro maestro en reservas (monto_total o total según tu BD)
+        // 3. Crear registro maestro en reservas
         let reservaId;
         try {
             const nuevaReserva = await pool.query(
@@ -175,11 +175,21 @@ app.post('/api/reservas', async (req, res) => {
             reservaId = nuevaReserva.rows[0].id;
         }
 
-        // 4. Crear detalle de la reserva
-        await pool.query(
-            'INSERT INTO detalle_reserva (reserva_id, paquete_id) VALUES ($1, $2)',
-            [reservaId, paquete_id]
-        );
+        // 4. Crear detalle de reserva enviando cantidad_personas y precio_unitario si aplica
+        try {
+            await pool.query(
+                `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas, precio_unitario) 
+                 VALUES ($1, $2, $3, $4)`,
+                [reservaId, paquete_id, personas, precioLimpio]
+            );
+        } catch (errDetalle) {
+            // Reintento sin precio_unitario si esa columna no existiera en detalle_reserva
+            await pool.query(
+                `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas) 
+                 VALUES ($1, $2, $3)`,
+                [reservaId, paquete_id, personas]
+            );
+        }
 
         res.status(201).json({ 
             mensaje: 'Reserva realizada con éxito', 

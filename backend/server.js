@@ -37,7 +37,7 @@ app.get('/api/destinos', async (req, res) => {
     }
 });
 
-// OBTENER PAQUETES (Prioriza destino_nombre tipeado a mano)
+// OBTENER PAQUETES
 app.get('/api/paquetes', async (req, res) => {
     try {
         const resultado = await pool.query(`
@@ -130,7 +130,41 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CRUD COMPLETO DE PAQUETES (Para Flutter/Web)
+// CREAR RESERVA (NUEVO ENDPOINT)
+// ============================================
+app.post('/api/reservas', async (req, res) => {
+    const { usuario_id, paquete_id, precio } = req.body;
+
+    if (!paquete_id || !precio) {
+        return res.status(400).json({ error: 'Faltan datos requeridos para la reserva' });
+    }
+
+    try {
+        // 1. Crear registro maestro en reservas (usuario por defecto: 1)
+        const nuevaReserva = await pool.query(
+            'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
+            [usuario_id || 1, precio]
+        );
+        const reservaId = nuevaReserva.rows[0].id;
+
+        // 2. Crear detalle de la reserva
+        await pool.query(
+            'INSERT INTO detalle_reserva (reserva_id, paquete_id) VALUES ($1, $2)',
+            [reservaId, paquete_id]
+        );
+
+        res.status(201).json({ 
+            mensaje: 'Reserva realizada con éxito', 
+            reserva_id: reservaId 
+        });
+    } catch (error) {
+        console.error('ERROR al crear reserva:', error.message);
+        res.status(500).json({ error: 'Error al procesar la reserva' });
+    }
+});
+
+// ============================================
+// CRUD COMPLETO DE PAQUETES
 // ============================================
 
 // CREAR PAQUETE
@@ -152,13 +186,12 @@ app.post('/api/paquetes', async (req, res) => {
     }
 });
 
-// ACTUALIZAR PAQUETE (Soporta actualización limpia de Check-in)
+// ACTUALIZAR PAQUETE
 app.put('/api/paquetes/:id', async (req, res) => {
     const { id } = req.params;
     const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio, check_in, checkIn } = req.body;
     const nombreDestinoFinal = destino_nombre || destino || null;
     
-    // Captura explícitamente el valor booleano recibido o mantén undefined
     const checkInValor = (check_in !== undefined) ? check_in : ((checkIn !== undefined) ? checkIn : true);
 
     try {

@@ -14,11 +14,14 @@ const pool = new Pool({
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Auto-crear las columnas necesarias en la base de datos si no existen
+// Auto-crear / ajustar columnas necesarias en la base de datos si no existen
 pool.query(`
     ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS destino_nombre VARCHAR(255);
     ALTER TABLE paquetes ADD COLUMN IF NOT EXISTS check_in BOOLEAN DEFAULT false;
     ALTER TABLE reservas ADD COLUMN IF NOT EXISTS monto_total NUMERIC(10,2);
+    ALTER TABLE detalle_reserva ALTER COLUMN cantidad_personas SET DEFAULT 1;
+    ALTER TABLE detalle_reserva ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2);
+    ALTER TABLE detalle_reserva ADD COLUMN IF NOT EXISTS precio_unitario NUMERIC(10,2);
 `)
     .then(() => console.log('Estructura de la base de datos verificada correctamente.'))
     .catch(err => console.error('Error al verificar columnas:', err.message));
@@ -131,10 +134,10 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CREAR RESERVA (CON CANTIDAD DE PERSONAS Y MANEJO ROBUSTO)
+// CREAR RESERVA (CORREGIDO CON SUBTOTAL)
 // ============================================
 app.post('/api/reservas', async (req, res) => {
-    const { usuario_id, paquete_id, precio, cantidad_personas } = req.body;
+    const { usuario_id, paquete_id, precio, cantidad_personas, subtotal } = req.body;
 
     if (!paquete_id || !precio) {
         return res.status(400).json({ error: 'Faltan datos requeridos para la reserva' });
@@ -155,40 +158,48 @@ app.post('/api/reservas', async (req, res) => {
             clienteId = nuevoUsuario.rows[0].id;
         }
 
-        // 2. Limpiar el precio y definir cantidad de personas (1 por defecto)
+        // 2. Limpiar el precio y calcular el subtotal
         const precioLimpio = parseFloat(String(precio).replace(/[^0-9.]/g, '')) || 0;
         const personas = parseInt(cantidad_personas) || 1;
+        const subtotalCalculado = parseFloat(subtotal) || (precioLimpio * personas);
 
         // 3. Crear registro maestro en reservas
         let reservaId;
         try {
             const nuevaReserva = await pool.query(
                 'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
-                [clienteId, precioLimpio]
+                [clienteId, subtotalCalculado]
             );
             reservaId = nuevaReserva.rows[0].id;
         } catch (errCol) {
             const nuevaReserva = await pool.query(
                 'INSERT INTO reservas (usuario_id, total) VALUES ($1, $2) RETURNING id',
-                [clienteId, precioLimpio]
+                [clienteId, subtotalCalculado]
             );
             reservaId = nuevaReserva.rows[0].id;
         }
 
-        // 4. Crear detalle de reserva enviando cantidad_personas y precio_unitario si aplica
+        // 4. Crear detalle de la reserva enviando subtotal y precio_unitario con fallbacks
         try {
             await pool.query(
-                `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas, precio_unitario) 
-                 VALUES ($1, $2, $3, $4)`,
-                [reservaId, paquete_id, personas, precioLimpio]
+                `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas, precio_unitario, subtotal) 
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [reservaId, paquete_id, personas, precioLimpio, subtotalCalculado]
             );
-        } catch (errDetalle) {
-            // Reintento sin precio_unitario si esa columna no existiera en detalle_reserva
-            await pool.query(
-                `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas) 
-                 VALUES ($1, $2, $3)`,
-                [reservaId, paquete_id, personas]
-            );
+        } catch (errDetalle1) {
+            try {
+                await pool.query(
+                    `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas, subtotal) 
+                     VALUES ($1, $2, $3, $4)`,
+                    [reservaId, paquete_id, personas, subtotalCalculado]
+                );
+            } catch (errDetalle2) {
+                await pool.query(
+                    `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas) 
+                     VALUES ($1, $2, $3)`,
+                    [reservaId, paquete_id, personas]
+                );
+            }
         }
 
         res.status(201).json({ 

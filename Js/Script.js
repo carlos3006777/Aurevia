@@ -1,4 +1,4 @@
-const API_URL = 'https://aurevia-1.onrender.com';
+const API_URL = 'https://aurevia-ye9a.onrender.com';
 
 // REGISTRO DE USUARIO
 const formRegistro = document.getElementById('formRegistro');
@@ -137,39 +137,8 @@ if (destinosGrid) {
             });
         })
         .catch(error => {
-            console.error('Error al cargar destinos de la API, cargando datos locales:', error);
-            cargarDestinosLocales();
+            console.error('Error al cargar destinos:', error);
         });
-}
-
-function cargarDestinosLocales() {
-    const destinosLocales = [
-        { nombre: "París", pais: "Francia", dias: 7, precio: "899.00", imagen: "../img/paris.jpg", descripcion: "Conoce la Torre Eiffel, camina por el Sena y disfruta de la gastronomía francesa." },
-        { nombre: "Maldivas", pais: "Maldivas", dias: 5, precio: "1299.00", imagen: "../img/maldivas.jpg", descripcion: "Relájate en villas sobre el agua y explora arrecifes de coral." },
-        { nombre: "Kyoto", pais: "Japón", dias: 6, precio: "1099.00", imagen: "../img/kyoto.jpg", descripcion: "Camina entre templos milenarios, jardines zen y experimenta la cultura tradicional." },
-        { nombre: "Cancún", pais: "México", dias: 5, precio: "650.00", imagen: "../img/cancun.jpg", descripcion: "Disfruta de playas de arena blanca, aguas turquesas y ruinas mayas." },
-        { nombre: "Nueva York", pais: "Estados Unidos", dias: 6, precio: "1099.00", imagen: "../img/nuevayork.jpg", descripcion: "Recorre Times Square, pasea por Central Park y disfruta de la vida nocturna." },
-        { nombre: "Cusco", pais: "Perú", dias: 7, precio: "799.00", imagen: "../img/cusco.jpg", descripcion: "Explora la cuna del imperio inca y visita la maravilla del mundo Machu Picchu." }
-    ];
-
-    if (!destinosGrid) return;
-    destinosGrid.innerHTML = "";
-    destinosLocales.forEach(destino => {
-        destinosGrid.innerHTML += `
-            <div class="destino-card">
-                <img src="${destino.imagen}" alt="${destino.nombre}">
-                <div class="destino-info-basica">
-                    <h3>${destino.nombre}</h3>
-                    <p>${destino.pais} · ${destino.dias} días</p>
-                    <span>Desde $${destino.precio}</span>
-                </div>
-                <div class="destino-overlay">
-                    <h3>${destino.nombre}</h3>
-                    <p>${destino.descripcion}</p>
-                </div>
-            </div>
-        `;
-    });
 }
 
 // MOSTRAR PAQUETES EN LA PÁGINA
@@ -243,23 +212,11 @@ if (formContacto) {
     });
 }
 
-// ACORDEÓN DE PREGUNTAS FRECUENTES (FAQ)
-const preguntasFaq = document.querySelectorAll('.faq-pregunta');
-preguntasFaq.forEach(pregunta => {
-    pregunta.addEventListener('click', () => {
-        const item = pregunta.parentElement;
-        item.classList.toggle('activo');
-    });
-});
-
-// FUNCIONES PARA EL MODAL DE CHECK-IN
+// MODAL Y CHECK-IN
 function obtenerSelectPaquete() {
-    return document.getElementById('selectPaquete') || 
-           document.getElementById('paquete_select') || 
-           document.getElementById('paqueteSelect') || 
-           document.querySelector('#modal-checkin select') || 
-           document.querySelector('#modalCheckIn select') ||
-           document.querySelector('form select');
+    return document.getElementById('paquete_select') || 
+           document.getElementById('selectPaquete') || 
+           document.getElementById('paqueteSelect');
 }
 
 async function abrirModalCheckin() {
@@ -326,14 +283,13 @@ async function procesarCheckin(e) {
         });
 
         if (respuesta.ok) {
-            const numReserva = document.getElementById('codigo_reserva')?.value || document.querySelector('input[type="text"]')?.value || 'solicitada';
             if (mensaje) {
-                mensaje.textContent = `¡Check-in realizado con éxito!`;
+                mensaje.textContent = '¡Check-in realizado con éxito!';
                 mensaje.style.color = 'green';
             }
 
             setTimeout(() => {
-                const formCheckin = document.getElementById('formCheckin') || document.querySelector('form');
+                const formCheckin = document.getElementById('formCheckin');
                 if (formCheckin) formCheckin.reset();
                 if (mensaje) mensaje.textContent = '';
                 cerrarModalCheckin();
@@ -351,10 +307,4 @@ async function procesarCheckin(e) {
             mensaje.style.color = 'red';
         }
     }
-}
-
-// VINCULAR EVENTO DE SUBMIT AL FORMULARIO DE CHECK-IN AUTOMÁTICAMENTE
-const formCheckin = document.getElementById('formCheckin') || document.querySelector('#modal-checkin form');
-if (formCheckin) {
-    formCheckin.addEventListener('submit', procesarCheckin);
 }

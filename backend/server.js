@@ -130,7 +130,7 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CREAR RESERVA (NUEVO ENDPOINT)
+// CREAR RESERVA (ACTUALIZADO CON MANEJO DE USUARIO Y PRECIO)
 // ============================================
 app.post('/api/reservas', async (req, res) => {
     const { usuario_id, paquete_id, precio } = req.body;
@@ -140,14 +140,32 @@ app.post('/api/reservas', async (req, res) => {
     }
 
     try {
-        // 1. Crear registro maestro en reservas (usuario por defecto: 1)
+        let clienteId = usuario_id || 1;
+
+        // 1. Verificar si el usuario existe en la BD
+        const usuarioExiste = await pool.query('SELECT id FROM usuarios WHERE id = $1', [clienteId]);
+        
+        // Si no existe el usuario (por ejemplo id = 1), creamos uno por defecto
+        if (usuarioExiste.rows.length === 0) {
+            const nuevoUsuario = await pool.query(`
+                INSERT INTO usuarios (nombre, apellido, correo, contrasena) 
+                VALUES ('Usuario', 'Invitado', 'invitado@aurevia.com', '123456') 
+                RETURNING id
+            `);
+            clienteId = nuevoUsuario.rows[0].id;
+        }
+
+        // 2. Limpiar el formato del precio a número flotante
+        const precioLimpio = parseFloat(String(precio).replace(/[^0-9.]/g, '')) || 0;
+
+        // 3. Crear registro maestro en reservas
         const nuevaReserva = await pool.query(
             'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
-            [usuario_id || 1, precio]
+            [clienteId, precioLimpio]
         );
         const reservaId = nuevaReserva.rows[0].id;
 
-        // 2. Crear detalle de la reserva
+        // 4. Crear detalle de la reserva
         await pool.query(
             'INSERT INTO detalle_reserva (reserva_id, paquete_id) VALUES ($1, $2)',
             [reservaId, paquete_id]
@@ -158,8 +176,8 @@ app.post('/api/reservas', async (req, res) => {
             reserva_id: reservaId 
         });
     } catch (error) {
-        console.error('ERROR al crear reserva:', error.message);
-        res.status(500).json({ error: 'Error al procesar la reserva' });
+        console.error('ERROR DETALLADO EN RESERVA:', error.message);
+        res.status(500).json({ error: 'Error al procesar la reserva', detalle: error.message });
     }
 });
 

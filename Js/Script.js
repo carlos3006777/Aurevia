@@ -141,7 +141,7 @@ if (destinosGrid) {
         });
 }
 
-// MOSTRAR PAQUETES EN LA PÁGINA
+// MOSTRAR PAQUETES CON BOTÓN DE RESERVA
 const paquetesGrid = document.getElementById('paquetesGrid');
 if (paquetesGrid) {
     fetch(`${API_URL}/api/paquetes`)
@@ -159,6 +159,9 @@ if (paquetesGrid) {
                         <p>✈️ ${paquete.transporte || ''}</p>
                         <p>🍽️ ${paquete.alimentacion || ''}</p>
                         <p class="destino-card-precio">$${paquete.precio}</p>
+                        <button onclick="reservarPaquete(${paquete.id}, ${paquete.precio})" style="background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                            Reservar Ahora
+                        </button>
                     </div>
                 `;
                 paquetesGrid.appendChild(card);
@@ -168,6 +171,32 @@ if (paquetesGrid) {
             console.error('Error al cargar paquetes:', error);
             paquetesGrid.innerHTML = '<p>No se pudieron cargar los paquetes.</p>';
         });
+}
+
+// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND
+async function reservarPaquete(paqueteId, precio) {
+    if (!confirm('¿Deseas confirmar la reserva de este paquete?')) return;
+
+    try {
+        const respuesta = await fetch(`${API_URL}/api/reservas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                usuario_id: 1, // ID por defecto de prueba
+                paquete_id: paqueteId,
+                precio: precio
+            })
+        });
+
+        if (respuesta.ok) {
+            alert('¡Reserva realizada con éxito!');
+        } else {
+            alert('Ocurrió un error al procesar la reserva.');
+        }
+    } catch (error) {
+        console.error('Error en reservarPaquete:', error);
+        alert('Error de conexión con el servidor.');
+    }
 }
 
 // FORMULARIO DE CONTACTO

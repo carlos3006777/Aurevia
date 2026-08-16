@@ -253,7 +253,10 @@ function cerrarModalCheckin() {
 }
 
 async function procesarCheckin(e) {
-    if (e) e.preventDefault();
+    if (e) {
+        e.preventDefault(); // Detiene la recarga de la página
+        e.stopPropagation();
+    }
     
     const mensaje = document.getElementById('mensajeCheckin') || document.getElementById('mensaje');
     const selectPaquetes = obtenerSelectPaquete();
@@ -263,7 +266,7 @@ async function procesarCheckin(e) {
             mensaje.textContent = 'Por favor selecciona un paquete válido';
             mensaje.style.color = 'red';
         }
-        return;
+        return false;
     }
 
     const idPaqueteSeleccionado = selectPaquetes.value;
@@ -307,4 +310,5 @@ async function procesarCheckin(e) {
             mensaje.style.color = 'red';
         }
     }
+    return false;
 }

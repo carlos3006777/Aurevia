@@ -182,16 +182,20 @@ async function reservarPaquete(paqueteId, precio) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                usuario_id: 1, // ID por defecto de prueba
+                usuario_id: 1,
                 paquete_id: paqueteId,
                 precio: precio
             })
         });
 
+        const data = await respuesta.json().catch(() => null);
+
         if (respuesta.ok) {
             alert('¡Reserva realizada con éxito!');
         } else {
-            alert('Ocurrió un error al procesar la reserva.');
+            // Muestra el mensaje de error exacto enviado por PostgreSQL / Node.js
+            const msjError = data?.detalle || data?.error || 'Error en el servidor';
+            alert(`Error al procesar reserva: ${msjError}`);
         }
     } catch (error) {
         console.error('Error en reservarPaquete:', error);

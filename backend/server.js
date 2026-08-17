@@ -22,6 +22,16 @@ pool.query(`
     ALTER TABLE detalle_reserva ALTER COLUMN cantidad_personas SET DEFAULT 1;
     ALTER TABLE detalle_reserva ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2);
     ALTER TABLE detalle_reserva ADD COLUMN IF NOT EXISTS precio_unitario NUMERIC(10,2);
+    
+    CREATE TABLE IF NOT EXISTS checkins (
+        id SERIAL PRIMARY KEY,
+        reserva_id INT NOT NULL,
+        paquete_id INT NOT NULL,
+        fecha_checkin TIMESTAMP DEFAULT NOW(),
+        estado_checkin VARCHAR(20) DEFAULT 'Completado',
+        FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
+        FOREIGN KEY (paquete_id) REFERENCES paquetes(id) ON DELETE CASCADE
+    );
 `)
     .then(() => console.log('Estructura de la base de datos verificada correctamente.'))
     .catch(err => console.error('Error al verificar columnas:', err.message));
@@ -134,7 +144,7 @@ app.post('/api/contacto', async (req, res) => {
 });
 
 // ============================================
-// CREAR RESERVA (CORREGIDO CON SUBTOTAL)
+// CREAR RESERVA Y REGISTRAR CHECK-IN AUTOMÁTICO
 // ============================================
 app.post('/api/reservas', async (req, res) => {
     const { usuario_id, paquete_id, precio, cantidad_personas, subtotal } = req.body;
@@ -167,19 +177,19 @@ app.post('/api/reservas', async (req, res) => {
         let reservaId;
         try {
             const nuevaReserva = await pool.query(
-                'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
+                'INSERT INTO reservas (usuario_id, total) VALUES ($1, $2) RETURNING id',
                 [clienteId, subtotalCalculado]
             );
             reservaId = nuevaReserva.rows[0].id;
         } catch (errCol) {
             const nuevaReserva = await pool.query(
-                'INSERT INTO reservas (usuario_id, total) VALUES ($1, $2) RETURNING id',
+                'INSERT INTO reservas (usuario_id, monto_total) VALUES ($1, $2) RETURNING id',
                 [clienteId, subtotalCalculado]
             );
             reservaId = nuevaReserva.rows[0].id;
         }
 
-        // 4. Crear detalle de la reserva enviando subtotal y precio_unitario con fallbacks
+        // 4. Crear detalle de la reserva
         try {
             await pool.query(
                 `INSERT INTO detalle_reserva (reserva_id, paquete_id, cantidad_personas, precio_unitario, subtotal) 
@@ -202,13 +212,54 @@ app.post('/api/reservas', async (req, res) => {
             }
         }
 
+        // 5. REGISTRAR CHECK-IN AUTOMÁTICO EN LA TABLA CHECKINS Y ACTUALIZAR PAQUETE
+        try {
+            await pool.query(
+                'INSERT INTO checkins (reserva_id, paquete_id) VALUES ($1, $2)',
+                [reservaId, paquete_id]
+            );
+            await pool.query(
+                'UPDATE paquetes SET check_in = true WHERE id = $1',
+                [paquete_id]
+            );
+        } catch (errCheckin) {
+            console.error('Error al registrar check-in automático:', errCheckin.message);
+        }
+
         res.status(201).json({ 
-            mensaje: 'Reserva realizada con éxito', 
+            mensaje: 'Reserva y check-in realizados con éxito', 
             reserva_id: reservaId 
         });
     } catch (error) {
         console.error('ERROR DETALLADO EN RESERVA:', error.message);
         res.status(500).json({ error: 'Error al procesar la reserva', detalle: error.message });
+    }
+});
+
+// ============================================
+// ENDPOINT DIRECTO PARA REALIZAR CHECK-IN
+// ============================================
+app.post('/api/checkin', async (req, res) => {
+    const { reserva_id, paquete_id } = req.body;
+
+    if (!reserva_id || !paquete_id) {
+        return res.status(400).json({ error: 'Faltan datos requeridos (reserva_id, paquete_id)' });
+    }
+
+    try {
+        await pool.query(
+            'INSERT INTO checkins (reserva_id, paquete_id) VALUES ($1, $2)',
+            [reserva_id, paquete_id]
+        );
+        await pool.query(
+            'UPDATE paquetes SET check_in = true WHERE id = $1',
+            [paquete_id]
+        );
+
+        res.status(201).json({ mensaje: 'Check-in completado exitosamente' });
+    } catch (error) {
+        console.error('ERROR EN CHECK-IN:', error.message);
+        res.status(500).json({ error: 'Error al procesar el check-in', detalle: error.message });
     }
 });
 
@@ -292,7 +343,7 @@ app.delete('/api/paquetes/:id', async (req, res) => {
 });
 
 // ============================================
-// CONSULTAR RESERVAS Y AUDITORÍA
+// CONSULTAR RESERVAS, CHECKINS Y AUDITORÍA
 // ============================================
 
 app.get('/api/reservas', async (req, res) => {
@@ -307,7 +358,7 @@ app.get('/api/reservas', async (req, res) => {
 
 app.get('/api/auditoria', async (req, res) => {
     try {
-        const resultado = await pool.query('SELECT * FROM auditoria ORDER BY fecha_hora DESC');
+        const resultado = await pool.query('SELECT * FROM auditoria ORDER BY fecha_accion DESC');
         res.json(resultado.rows);
     } catch (error) {
         console.error('ERROR:', error.message);

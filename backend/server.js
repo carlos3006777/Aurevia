@@ -267,22 +267,43 @@ app.post('/api/checkin', async (req, res) => {
 // CRUD COMPLETO DE PAQUETES
 // ============================================
 
-// CREAR PAQUETE
+// CREAR PAQUETE (AJUSTADO PARA OBTENER/CREAR DESTINO DINÁMICAMENTE)
 app.post('/api/paquetes', async (req, res) => {
     const { destino_id, destino_nombre, destino, nombre, hotel, transporte, alimentacion, precio, check_in, checkIn } = req.body;
-    const nombreDestinoFinal = destino_nombre || destino || null;
+    const nombreDestinoFinal = destino_nombre || destino || 'Internacional';
     const checkInFinal = check_in ?? checkIn ?? false;
+    const precioNumerico = parseFloat(String(precio).replace(/[^0-9.]/g, '')) || 0;
 
     try {
+        let destinoIdReal = destino_id;
+
+        // Si no enviaron un destino_id explícito desde el cliente, buscamos o creamos el destino
+        if (!destinoIdReal) {
+            const buscarDestino = await pool.query(
+                'SELECT id FROM destinos WHERE LOWER(nombre) = LOWER($1) LIMIT 1',
+                [nombreDestinoFinal]
+            );
+
+            if (buscarDestino.rows.length > 0) {
+                destinoIdReal = buscarDestino.rows[0].id;
+            } else {
+                const nuevoDestino = await pool.query(
+                    'INSERT INTO destinos (nombre, pais, precio_desde) VALUES ($1, $1, $2) RETURNING id',
+                    [nombreDestinoFinal, precioNumerico]
+                );
+                destinoIdReal = nuevoDestino.rows[0].id;
+            }
+        }
+
         const resultado = await pool.query(
             `INSERT INTO paquetes (destino_id, destino_nombre, nombre, hotel, transporte, alimentacion, precio, check_in)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [destino_id || 1, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precio, checkInFinal]
+            [destinoIdReal, nombreDestinoFinal, nombre, hotel, transporte, alimentacion, precioNumerico, checkInFinal]
         );
         res.status(201).json(resultado.rows[0]);
     } catch (error) {
-        console.error('ERROR:', error.message);
-        res.status(500).json({ error: 'Error al crear paquete' });
+        console.error('ERROR AL CREAR PAQUETE:', error.message);
+        res.status(500).json({ error: 'Error al crear paquete', detalle: error.message });
     }
 });
 

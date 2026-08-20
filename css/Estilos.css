@@ -54,6 +54,7 @@ header h1 {
     letter-spacing: 2px;
     background: linear-gradient(90deg, #FFFFFF, var(--accent-cyan));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
 }

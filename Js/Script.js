@@ -1,5 +1,61 @@
 const API_URL = 'https://aurevia-ye9a.onrender.com';
 
+// FUNCIÓN PARA ACTUALIZAR EL MENÚ SEGÚN EL ESTADO DE SESIÓN
+function actualizarMenuUsuario() {
+    const estaLogueado = localStorage.getItem('usuarioLogueado');
+    const nombreUsuario = localStorage.getItem('nombreUsuario') || 'Usuario';
+
+    // Buscar el contenedor de los botones de registro/login en el header
+    // O los enlaces individuales por su texto/atributos
+    const navLinks = document.querySelectorAll('nav a, header a, .nav-links a');
+
+    navLinks.forEach(link => {
+        const texto = link.textContent.trim().toUpperCase();
+        if (texto.includes('INICIAR SESIÓN') || texto.includes('REGISTRARSE')) {
+            if (estaLogueado) {
+                link.style.display = 'none'; // Ocultar si está logueado
+            } else {
+                link.style.display = 'inline-block'; // Mostrar si no está logueado
+            }
+        }
+    });
+
+    // Si está logueado, insertamos la insignia del usuario en el nav si no se ha agregado aún
+    if (estaLogueado && !document.getElementById('user-profile-badge')) {
+        const headerNav = document.querySelector('header nav') || document.querySelector('nav');
+        if (headerNav) {
+            const userBadge = document.createElement('div');
+            userBadge.id = 'user-profile-badge';
+            userBadge.style.display = 'inline-flex';
+            userBadge.style.alignItems = 'center';
+            userBadge.style.gap = '10px';
+            userBadge.style.marginLeft = '15px';
+            userBadge.style.color = '#00F0FF';
+            userBadge.style.fontWeight = 'bold';
+
+            userBadge.innerHTML = `
+                <span><i class="fa-solid fa-user"></i> ${nombreUsuario}</span>
+                <button id="btnCerrarSesion" style="background: transparent; border: 1px solid #00F0FF; color: #00F0FF; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                    Cerrar Sesión
+                </button>
+            `;
+
+            headerNav.appendChild(userBadge);
+
+            document.getElementById('btnCerrarSesion')?.addEventListener('click', () => {
+                localStorage.removeItem('usuarioLogueado');
+                localStorage.removeItem('nombreUsuario');
+                window.location.reload();
+            });
+        }
+    }
+}
+
+// Ejecutar la actualización del menú al cargar cualquier página
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarMenuUsuario();
+});
+
 // REGISTRO DE USUARIO
 const formRegistro = document.getElementById('formRegistro');
 if (formRegistro) {
@@ -66,7 +122,7 @@ if (formRegistro) {
     });
 }
 
-// LOGIN (Guarda estado de sesión en localStorage)
+// LOGIN (Guarda estado de sesión y redirige al usuario a donde estaba)
 const formLogin = document.getElementById('formLogin');
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
@@ -83,14 +139,26 @@ if (formLogin) {
                 body: JSON.stringify({ correo, contrasena })
             });
 
+            const data = await respuesta.json().catch(() => null);
+
             if (respuesta.ok) {
                 localStorage.setItem('usuarioLogueado', 'true');
+                // Si el backend devuelve el nombre del usuario, lo guardamos. Si no, usamos parte del correo
+                const nombreGuardar = data?.usuario?.nombre || data?.nombre || correo.split('@')[0];
+                localStorage.setItem('nombreUsuario', nombreGuardar);
+
                 if (mensaje) {
-                    mensaje.textContent = 'Bienvenido/a a Aurevia';
+                    mensaje.textContent = `Sesión exitosa, bienvenido/a a Aurevia, ${nombreGuardar}`;
                     mensaje.style.color = 'green';
                 }
+
                 setTimeout(() => {
-                    window.location.href = '../index.html';
+                    // Si vino de una página previa, vuelve a ella; si no, va a la página principal
+                    if (document.referrer && !document.referrer.includes('login.html') && !document.referrer.includes('sign_up.html')) {
+                        window.location.href = document.referrer;
+                    } else {
+                        window.location.href = '../index.html';
+                    }
                 }, 1500);
             } else if (respuesta.status === 404) {
                 if (mensaje) {
@@ -176,7 +244,7 @@ if (paquetesGrid) {
         });
 }
 
-// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND (VALIDACIÓN DE LOGIN AÑADIDA)
+// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND
 async function reservarPaquete(paqueteId, precio) {
     const estaLogueado = localStorage.getItem('usuarioLogueado');
     if (!estaLogueado) {
@@ -261,7 +329,6 @@ function obtenerSelectPaquete() {
            document.getElementById('paqueteSelect');
 }
 
-// VALIDACIÓN DE LOGIN AÑADIDA AL ABRIR CHECK-IN
 async function abrirModalCheckin() {
     const estaLogueado = localStorage.getItem('usuarioLogueado');
     if (!estaLogueado) {

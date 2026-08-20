@@ -5,56 +5,36 @@ function actualizarMenuUsuario() {
     const estaLogueado = localStorage.getItem('usuarioLogueado');
     const nombreUsuario = localStorage.getItem('nombreUsuario') || 'Usuario';
 
-    // Buscar el contenedor de los botones de registro/login en el header
-    // O los enlaces individuales por su texto/atributos
-    const navLinks = document.querySelectorAll('nav a, header a, .nav-links a');
-
-    navLinks.forEach(link => {
-        const texto = link.textContent.trim().toUpperCase();
-        if (texto.includes('INICIAR SESIÓN') || texto.includes('REGISTRARSE')) {
-            if (estaLogueado) {
-                link.style.display = 'none'; // Ocultar si está logueado
-            } else {
-                link.style.display = 'inline-block'; // Mostrar si no está logueado
-            }
-        }
-    });
-
-    // Si está logueado, insertamos la insignia del usuario en el nav si no se ha agregado aún
-    if (estaLogueado && !document.getElementById('user-profile-badge')) {
-        const headerNav = document.querySelector('header nav') || document.querySelector('nav');
-        if (headerNav) {
-            const userBadge = document.createElement('div');
-            userBadge.id = 'user-profile-badge';
-            userBadge.style.display = 'inline-flex';
-            userBadge.style.alignItems = 'center';
-            userBadge.style.gap = '10px';
-            userBadge.style.marginLeft = '15px';
-            userBadge.style.color = '#00F0FF';
-            userBadge.style.fontWeight = 'bold';
-
-            userBadge.innerHTML = `
-                <span><i class="fa-solid fa-user"></i> ${nombreUsuario}</span>
-                <button id="btnCerrarSesion" style="background: transparent; border: 1px solid #00F0FF; color: #00F0FF; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+    // Buscar el contenedor de los botones de login/registro
+    const divRegistros = document.querySelector('.registros');
+    
+    // Si la sesión está activa y existe el contenedor de botones
+    if (estaLogueado && divRegistros) {
+        divRegistros.innerHTML = `
+            <div id="user-profile-badge" style="display: inline-flex; align-items: center; gap: 10px; color: #00F0FF; font-weight: bold;">
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-user" style="color: #00F0FF; font-size: 16px;"></i> ${nombreUsuario}
+                </span>
+                <button id="btnCerrarSesion" style="background: transparent; border: 1px solid #00F0FF; color: #00F0FF; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 5px;">
                     Cerrar Sesión
                 </button>
-            `;
+            </div>
+        `;
 
-            headerNav.appendChild(userBadge);
-
-            document.getElementById('btnCerrarSesion')?.addEventListener('click', () => {
-                localStorage.removeItem('usuarioLogueado');
-                localStorage.removeItem('nombreUsuario');
-                window.location.reload();
-            });
-        }
+        document.getElementById('btnCerrarSesion')?.addEventListener('click', () => {
+            localStorage.removeItem('usuarioLogueado');
+            localStorage.removeItem('nombreUsuario');
+            window.location.reload();
+        });
     }
 }
 
-// Ejecutar la actualización del menú al cargar cualquier página
-document.addEventListener('DOMContentLoaded', () => {
+// Ejecutar la actualización inmediatamente al cargar la página
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', actualizarMenuUsuario);
+} else {
     actualizarMenuUsuario();
-});
+}
 
 // REGISTRO DE USUARIO
 const formRegistro = document.getElementById('formRegistro');
@@ -122,7 +102,7 @@ if (formRegistro) {
     });
 }
 
-// LOGIN (Guarda estado de sesión y redirige al usuario a donde estaba)
+// LOGIN (Guarda estado de sesión y redirige al usuario)
 const formLogin = document.getElementById('formLogin');
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
@@ -143,7 +123,6 @@ if (formLogin) {
 
             if (respuesta.ok) {
                 localStorage.setItem('usuarioLogueado', 'true');
-                // Si el backend devuelve el nombre del usuario, lo guardamos. Si no, usamos parte del correo
                 const nombreGuardar = data?.usuario?.nombre || data?.nombre || correo.split('@')[0];
                 localStorage.setItem('nombreUsuario', nombreGuardar);
 
@@ -153,7 +132,6 @@ if (formLogin) {
                 }
 
                 setTimeout(() => {
-                    // Si vino de una página previa, vuelve a ella; si no, va a la página principal
                     if (document.referrer && !document.referrer.includes('login.html') && !document.referrer.includes('sign_up.html')) {
                         window.location.href = document.referrer;
                     } else {
@@ -181,7 +159,7 @@ if (formLogin) {
     });
 }
 
-// MOSTRAR DESTINOS (REEMPLAZANDO IMÁGENES POR ICONO DE AVIÓN)
+// MOSTRAR DESTINOS
 const destinosGrid = document.getElementById('destinosGrid');
 if (destinosGrid) {
     fetch(`${API_URL}/api/destinos`)
@@ -212,7 +190,7 @@ if (destinosGrid) {
         });
 }
 
-// MOSTRAR PAQUETES CON BOTÓN DE RESERVA
+// MOSTRAR PAQUETES
 const paquetesGrid = document.getElementById('paquetesGrid');
 if (paquetesGrid) {
     fetch(`${API_URL}/api/paquetes`)
@@ -244,7 +222,7 @@ if (paquetesGrid) {
         });
 }
 
-// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND
+// RESERVAS
 async function reservarPaquete(paqueteId, precio) {
     const estaLogueado = localStorage.getItem('usuarioLogueado');
     if (!estaLogueado) {
@@ -322,7 +300,7 @@ if (formContacto) {
     });
 }
 
-// MODAL Y CHECK-IN
+// CHECK-IN
 function obtenerSelectPaquete() {
     return document.getElementById('paquete_select') || 
            document.getElementById('selectPaquete') || 
@@ -429,7 +407,6 @@ async function procesarCheckin(e) {
     }
 }
 
-// Vinculación limpia de eventos
 const formCheckin = document.getElementById('formCheckin');
 if (formCheckin) {
     formCheckin.addEventListener('submit', procesarCheckin);

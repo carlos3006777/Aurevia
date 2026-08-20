@@ -66,7 +66,7 @@ if (formRegistro) {
     });
 }
 
-// LOGIN
+// LOGIN (Guarda estado de sesión en localStorage)
 const formLogin = document.getElementById('formLogin');
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
@@ -84,6 +84,7 @@ if (formLogin) {
             });
 
             if (respuesta.ok) {
+                localStorage.setItem('usuarioLogueado', 'true');
                 if (mensaje) {
                     mensaje.textContent = 'Bienvenido/a a Aurevia';
                     mensaje.style.color = 'green';
@@ -175,8 +176,15 @@ if (paquetesGrid) {
         });
 }
 
-// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND
+// FUNCIÓN PARA PROCESAR RESERVAS DESDE EL FRONTEND (VALIDACIÓN DE LOGIN AÑADIDA)
 async function reservarPaquete(paqueteId, precio) {
+    const estaLogueado = localStorage.getItem('usuarioLogueado');
+    if (!estaLogueado) {
+        alert('Debes registrarte e iniciar sesión primero para continuar con el proceso de reserva.');
+        window.location.href = '../Registros/login.html';
+        return;
+    }
+
     if (!confirm('¿Deseas confirmar la reserva de este paquete?')) return;
 
     try {
@@ -253,7 +261,15 @@ function obtenerSelectPaquete() {
            document.getElementById('paqueteSelect');
 }
 
+// VALIDACIÓN DE LOGIN AÑADIDA AL ABRIR CHECK-IN
 async function abrirModalCheckin() {
+    const estaLogueado = localStorage.getItem('usuarioLogueado');
+    if (!estaLogueado) {
+        alert('Debes registrarte e iniciar sesión primero para continuar con el check-in.');
+        window.location.href = '../Registros/login.html';
+        return;
+    }
+
     const modal = document.getElementById('modal-checkin') || document.getElementById('modalCheckIn');
     const selectPaquetes = obtenerSelectPaquete();
 

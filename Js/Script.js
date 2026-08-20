@@ -112,7 +112,7 @@ if (formLogin) {
     });
 }
 
-// MOSTRAR DESTINOS
+// MOSTRAR DESTINOS (REEMPLAZANDO IMÁGENES POR ICONO DE AVIÓN)
 const destinosGrid = document.getElementById('destinosGrid');
 if (destinosGrid) {
     fetch(`${API_URL}/api/destinos`)
@@ -122,11 +122,13 @@ if (destinosGrid) {
             destinos.forEach(destino => {
                 destinosGrid.innerHTML += `
                     <div class="destino-card">
-                        <img src="${destino.imagen}" alt="${destino.nombre}">
+                        <div style="background-color: #101B3B; padding: 25px; border-radius: 12px 12px 0 0; text-align: center; border-bottom: 1px solid #00F0FF;">
+                            <i class="fa-solid fa-plane-departure" style="font-size: 40px; color: #00F0FF;"></i>
+                        </div>
                         <div class="destino-info-basica">
                             <h3>${destino.nombre}</h3>
-                            <p>${destino.pais} · ${destino.duracion_dias || destino.dias} días</p>
-                            <span>Desde $${destino.precio_desde || destino.precio}</span>
+                            <p>${destino.pais} · ${destino.duracion_dias || destino.dias || 0} días</p>
+                            <span>Desde $${destino.precio_desde || destino.precio || '0'}</span>
                         </div>
                         <div class="destino-overlay">
                             <h3>${destino.nombre}</h3>
@@ -193,7 +195,6 @@ async function reservarPaquete(paqueteId, precio) {
         if (respuesta.ok) {
             alert('¡Reserva realizada con éxito!');
         } else {
-            // Muestra el mensaje de error exacto enviado por PostgreSQL / Node.js
             const msjError = data?.detalle || data?.error || 'Error en el servidor';
             alert(`Error al procesar reserva: ${msjError}`);
         }

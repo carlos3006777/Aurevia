@@ -1,4 +1,22 @@
-/*CONFIGURACIÓN GENERAL*/
+/* ===============================================
+   CONFIGURACIÓN GENERAL Y VARIABLES FUTURISTAS
+   =============================================== */
+:root {
+    --bg-main: #0B132B;          /* Azul Espacial Profundo */
+    --bg-card: #1C2541;          /* Azul Cabina / Panel */
+    --bg-surface: #101B3B;       /* Cristal de Interfaz */
+    --accent-cyan: #00F0FF;      /* Neón Cian Aerolínea */
+    --accent-blue: #3A86FF;      /* Azul Propulsión */
+    --accent-hover: #00C8D6;     /* Glow Activo */
+    --text-primary: #FFFFFF;     /* Texto Principal */
+    --text-secondary: #8D99AE;   /* Texto Datos de Vuelo */
+    --border-glow: rgba(0, 240, 255, 0.25);
+    --shadow-neon: 0 0 20px rgba(0, 240, 255, 0.2);
+    --shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --radius-tech: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,270 +24,329 @@
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #ffffff;
-    color: #333;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/*HEADER*/
+/* ===============================================
+   HEADER & NAVBAR (PANEL DE DESTAQUE DE VUELO)
+   =============================================== */
 header {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 20px 10px;
-    background-color: #0F172A;
-    color: white;
+    padding: 15px 5%;
+    background: rgba(11, 19, 43, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-glow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/*LOGO*/
+/* LOGO */
 header h1 {
-    font-size: 50px;
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #FFFFFF, var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
 }
 
-/*MENÚ*/
+/* MENÚ */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 nav a {
-    color: white;
+    color: var(--text-secondary);
     text-decoration: none;
-    margin: 0 5px;
-    transition: .3s;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    transition: var(--transition);
 }
 
 nav a:hover {
-    background-color: #18336e;
-    color: white;
+    color: var(--accent-cyan);
+    background-color: rgba(0, 240, 255, 0.08);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
 }
 
-/*BOTONES DEL HEADER*/
+/* BOTONES DEL HEADER (TICKETING / LOGIN) */
 .registros a {
-    padding: 10px;
-    background-color: white;
-    color: #18336e;
+    padding: 10px 20px;
+    background: transparent;
+    color: var(--accent-cyan);
     text-decoration: none;
-    border-radius: 10px;
-    margin-right: 15px;
-    transition: .3s;
+    border: 1px solid var(--accent-cyan);
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: var(--transition);
 }
 
 .registros a:hover {
-    background-color: #18336e;
-    color: white;
+    background: var(--accent-cyan);
+    color: var(--bg-main);
+    box-shadow: var(--shadow-neon);
 }
 
-/*HERO*/
+/* ===============================================
+   HERO SECTION (CABINA DE MANDO & EMBARQUE)
+   =============================================== */
 .hero {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 80px;
+    padding: 80px 8%;
     gap: 40px;
+    position: relative;
+    background: radial-gradient(circle at 80% 20%, rgba(58, 134, 255, 0.15) 0%, transparent 50%);
 }
 
-/*DESCRIPCIÓN*/
 .descripcion {
-    width: 55%;
+    width: 50%;
 }
 
 .descripcion h1 {
-    font-size: 55px;
+    font-size: 3.5rem;
+    line-height: 1.1;
+    font-weight: 800;
     margin-bottom: 20px;
-    color: #0F172A;
+    color: var(--text-primary);
 }
 
 .descripcion p {
-    font-size: 20px;
+    font-size: 1.15rem;
     line-height: 1.7;
-    color: #555;
-    margin-bottom: 30px;
+    color: var(--text-secondary);
+    margin-bottom: 35px;
 }
 
-/*BOTONES DEL HERO*/
+/* BOTONES DEL HERO */
 .descripcion a {
     display: inline-block;
-    padding: 12px 18px;
-    background-color: #0F172A;
-    color: white;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: var(--bg-main);
     text-decoration: none;
-    border-radius: 10px;
-    margin-right: 15px;
-    transition: .3s;
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-neon);
+    transition: var(--transition);
 }
 
 .descripcion a:hover {
-    background-color: #18336e;
+    transform: translateY(-3px);
+    filter: brightness(1.15);
 }
 
-/*IMAGEN*/
+/* IMAGEN HERO (VENTANILLA AERODINÁMICA) */
 .imagen {
     width: 45%;
+    position: relative;
 }
 
 .imagen img {
     width: 100%;
-    border-radius: 15px;
+    border-radius: var(--radius-tech);
+    border: 1px solid var(--border-glow);
+    box-shadow: var(--shadow-panel);
+    transition: var(--transition);
 }
 
-/*POR QUÉ ELEGIRNOS*/
+.imagen img:hover {
+    transform: scale(1.02);
+    border-color: var(--accent-cyan);
+}
+
+/* ===============================================
+   POR QUÉ ELEGIRNOS (PANEL DE BENEFICIOS)
+   =============================================== */
 .porque-elegirnos {
-    padding: 60px 80px;
+    padding: 80px 8%;
     text-align: center;
-    background-color: #f8f8f8;
+    background-color: var(--bg-surface);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .porque-elegirnos h1 {
-    font-size: 40px;
-    color: #0F172A;
-    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 50px;
+    letter-spacing: 1px;
 }
 
 .porque-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
 }
 
 .porque-card {
-    background-color: white;
-    padding: 30px 20px;
-    border-radius: 15px;
-    transition: .3s;
+    background-color: var(--bg-card);
+    padding: 35px 25px;
+    border-radius: var(--radius-tech);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
 }
 
 .porque-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-8px);
+    border-color: var(--accent-cyan);
+    box-shadow: var(--shadow-neon);
 }
 
 .porque-foto {
-    max-width: 80px; 
-    max-height: 80px; 
-    display: block; 
-    margin: 0 auto 15px auto; 
+    max-width: 65px;
+    max-height: 65px;
+    display: block;
+    margin: 0 auto 20px auto;
+    filter: drop-shadow(0 0 8px var(--accent-cyan));
 }
 
 .porque-card h3 {
-    font-size: 20px;
-    color: #0F172A;
-    margin-bottom: 10px;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
 }
 
 .porque-card p {
-    color: #666;
-    font-size: 15px;
-    line-height: 1.5;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
-/*TESTIMONIOS*/
+/* ===============================================
+   TESTIMONIOS (EXPERIENCIAS DE PASAJEROS)
+   =============================================== */
 .testimonios {
-    padding: 60px 80px;
+    padding: 80px 8%;
     text-align: center;
 }
 
 .testimonios h1 {
-    font-size: 40px;
-    color: #0F172A;
-    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 50px;
 }
 
 .testimonios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
 }
 
 .testimonio-card {
-    background-color: #f8f8f8;
+    background-color: var(--bg-card);
     padding: 30px;
-    border-radius: 15px;
+    border-radius: var(--radius-tech);
+    border-left: 4px solid var(--accent-cyan);
     text-align: left;
+    box-shadow: var(--shadow-panel);
 }
 
 .testimonio-texto {
-    color: #555;
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 20px;
     font-style: italic;
 }
 
 .testimonio-autor {
-    color: #0F172A;
-    font-weight: bold;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-/*FORMULARIOS (LOGIN Y REGISTRO)*/
+/* ===============================================
+   FORMULARIOS (CHECK-IN / LOGIN / REGISTRO)
+   =============================================== */
 .formulario-container {
     max-width: 450px;
-    margin: 60px auto;
+    margin: 80px auto;
     padding: 40px;
-    background-color: #f8f8f8;
-    border-radius: 15px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-tech);
+    box-shadow: var(--shadow-panel);
     text-align: center;
 }
 
 .formulario-container h1 {
-    font-size: 32px;
-    color: #0F172A;
+    font-size: 2rem;
+    color: var(--text-primary);
     margin-bottom: 30px;
 }
 
 .formulario-container form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
-.formulario-container input {
-    padding: 12px 15px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 16px;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.formulario-container input:focus {
-    outline: none;
-    border-color: #0F172A;
-}
-
+.formulario-container input,
 .formulario-container textarea {
-    padding: 12px 15px;
-    border: 1px solid #ccc;
+    padding: 14px 18px;
+    background-color: var(--bg-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    font-size: 16px;
-    font-family: Arial, Helvetica, sans-serif;
-    resize: vertical;
+    font-size: 1rem;
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition);
+}
+
+.formulario-container input:focus,
+.formulario-container textarea:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
 .formulario-container button {
-    padding: 12px;
-    background-color: #0F172A;
-    color: white;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: var(--bg-main);
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: .3s;
+    transition: var(--transition);
 }
 
 .formulario-container button:hover {
-    background-color: #18336e;
+    filter: brightness(1.15);
+    box-shadow: var(--shadow-neon);
 }
 
-#mensaje {
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-/*DESTINOS*/
+/* ===============================================
+   DESTINOS (TARJETAS DE RUTAS)
+   =============================================== */
 .destinos-container {
-    padding: 60px 80px;
+    padding: 80px 8%;
 }
 
 .destinos-container h1 {
-    font-size: 40px;
-    color: #0F172A;
+    font-size: 2.5rem;
+    color: var(--text-primary);
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
 }
 
 .destinos-grid {
@@ -279,100 +356,102 @@ nav a:hover {
 }
 
 .destino-card {
-    background-color: #f8f8f8;
-    border-radius: 15px;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-tech);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden;
-    transition: .3s;
+    transition: var(--transition);
 }
 
 .destino-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-8px);
+    border-color: var(--accent-cyan);
+    box-shadow: var(--shadow-neon);
 }
 
 .destino-card img {
     width: 100%;
-    height: 200px;
+    height: 220px;
     object-fit: cover;
 }
 
 .destino-card-info {
-    padding: 20px;
+    padding: 25px;
 }
 
 .destino-card-info h3 {
-    font-size: 22px;
-    color: #0F172A;
-    margin-bottom: 5px;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
 }
 
 .destino-card-info p {
-    color: #666;
-    margin-bottom: 10px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
 }
 
 .destino-card-precio {
-    font-weight: bold;
-    color: #0F172A;
-    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    font-size: 1.3rem;
 }
 
-/*NOSOTROS - HISTORIA*/
+/* ===============================================
+   NOSOTROS & VALORES (PANEL AERO-CORPORATIVO)
+   =============================================== */
 .nosotros-historia {
-    padding: 60px 80px;
+    padding: 80px 8%;
     text-align: center;
     max-width: 900px;
     margin: 0 auto;
 }
 
 .nosotros-historia h1 {
-    font-size: 40px;
-    color: #0F172A;
+    font-size: 2.5rem;
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
 .nosotros-historia p {
-    font-size: 18px;
-    line-height: 1.7;
-    color: #555;
+    font-size: 1.15rem;
+    color: var(--text-secondary);
 }
 
-/*NOSOTROS - MISIÓN Y VISIÓN*/
 .nosotros-mv {
     display: flex;
     gap: 30px;
-    padding: 20px 80px 60px;
+    padding: 0 8% 80px;
 }
 
 .mv-card {
     flex: 1;
-    background-color: #f8f8f8;
-    padding: 30px;
-    border-radius: 15px;
+    background-color: var(--bg-card);
+    padding: 35px;
+    border-radius: var(--radius-tech);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .mv-card h2 {
-    font-size: 26px;
-    color: #0F172A;
+    font-size: 1.6rem;
+    color: var(--accent-cyan);
     margin-bottom: 15px;
 }
 
 .mv-card p {
-    color: #555;
-    line-height: 1.6;
+    color: var(--text-secondary);
 }
 
-/*NOSOTROS - VALORES*/
 .nosotros-valores {
-    padding: 60px 80px;
-    background-color: #0F172A;
+    padding: 80px 8%;
+    background-color: var(--bg-surface);
     text-align: center;
 }
 
 .nosotros-valores h1 {
-    font-size: 40px;
-    color: white;
-    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 50px;
 }
 
 .valores-grid {
@@ -382,320 +461,238 @@ nav a:hover {
 }
 
 .valor-card {
-    background-color: #18336e;
+    background-color: var(--bg-card);
     padding: 30px 20px;
-    border-radius: 15px;
-    transition: .3s;
+    border-radius: var(--radius-tech);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
 }
 
 .valor-card:hover {
     transform: translateY(-5px);
+    border-color: var(--accent-cyan);
 }
 
 .valor-card h3 {
-    color: white;
-    font-size: 22px;
+    color: var(--accent-cyan);
+    font-size: 1.3rem;
     margin-bottom: 10px;
 }
 
 .valor-card p {
-    color: #cbd5e1;
-    font-size: 15px;
-    line-height: 1.5;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
-/*NOSOTROS - EQUIPO*/
+/* ===============================================
+   EQUIPACIÓN & TRIPULACIÓN
+   =============================================== */
 .nosotros-equipo, .equipo-container {
-    padding: 60px 80px;
+    padding: 80px 8%;
     text-align: center;
 }
 
 .nosotros-equipo h1, .equipo-container h2 {
-    font-size: 40px;
-    color: #0F172A;
-    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 50px;
 }
 
 .equipo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 30px;
 }
 
 .equipo-card, .tarjeta-equipo {
-    background-color: #f8f8f8;
-    padding: 30px 20px;
-    border-radius: 15px;
-    transition: .3s;
+    background-color: var(--bg-card);
+    padding: 35px 20px;
+    border-radius: var(--radius-tech);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
 }
 
 .equipo-card:hover, .tarjeta-equipo:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: var(--accent-cyan);
+    box-shadow: var(--shadow-neon);
 }
 
 .equipo-foto {
-    width: 130px;
-    height: 130px;
-    min-width: 130px;
-    min-height: 130px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 15px;
-    background-color: #e2e8f0;
-    display: block;
+    margin-bottom: 20px;
+    border: 2px solid var(--accent-cyan);
+    padding: 3px;
+    background-color: var(--bg-surface);
 }
 
 .equipo-card h3, .tarjeta-equipo h3 {
-    font-size: 20px;
-    color: #0F172A;
+    font-size: 1.25rem;
+    color: var(--text-primary);
     margin-bottom: 5px;
 }
 
 .equipo-card p, .tarjeta-equipo .puesto {
-    color: #666;
-    font-size: 14px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
-@media (max-width: 700px) {
-    .equipo-grid {
-        grid-template-columns: repeat(1, 1fr);
-    }
-}
-
-/*OFERTAS*/
+/* ===============================================
+   OFERTAS & PROMOCIONES DE VUELO
+   =============================================== */
 .ofertas {
-    padding: 40px 80px;
+    padding: 60px 8%;
 }
 
 .oferta-card {
-    background-color: #0F172A;
-    background: linear-gradient(135deg, #0F172A, #18336e);
-    color: white;
-    padding: 40px;
-    border-radius: 15px;
+    background: linear-gradient(135deg, #1C2541 0%, #0B132B 100%);
+    border: 1px solid var(--border-glow);
+    padding: 50px;
+    border-radius: var(--radius-tech);
     text-align: center;
+    box-shadow: var(--shadow-panel);
 }
 
 .oferta-tag {
     display: inline-block;
-    background-color: rgba(255,255,255,0.15);
-    padding: 6px 16px;
+    background-color: rgba(0, 240, 255, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    padding: 6px 18px;
     border-radius: 20px;
-    font-size: 14px;
-    margin-bottom: 15px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
 .oferta-card h1 {
-    font-size: 45px;
-    margin-bottom: 10px;
+    font-size: 3rem;
+    color: var(--text-primary);
+    margin-bottom: 15px;
 }
 
 .oferta-card p {
-    font-size: 16px;
-    color: #cbd5e1;
-    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
 }
 
 .oferta-card a {
     display: inline-block;
-    padding: 12px 24px;
-    background-color: white;
-    color: #0F172A;
+    padding: 14px 32px;
+    background: var(--accent-cyan);
+    color: var(--bg-main);
     text-decoration: none;
-    border-radius: 10px;
-    font-weight: bold;
-    transition: .3s;
+    border-radius: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: var(--transition);
 }
 
 .oferta-card a:hover {
-    background-color: #e2e8f0;
+    box-shadow: var(--shadow-neon);
+    transform: translateY(-2px);
 }
 
-/*ESTADÍSTICAS*/
+/* ===============================================
+   ESTADÍSTICAS EN TIEMPO REAL
+   =============================================== */
 .estadisticas {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    padding: 60px 80px;
-    background-color: #0F172A;
+    padding: 60px 8%;
+    background-color: var(--bg-surface);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
 }
 
 .estadistica-item h2 {
-    font-size: 45px;
-    color: white;
-    margin-bottom: 5px;
+    font-size: 3rem;
+    color: var(--accent-cyan);
+    font-weight: 900;
 }
 
 .estadistica-item p {
-    color: #cbd5e1;
-    font-size: 16px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/*FAQ*/
-.faq {
-    padding: 60px 80px;
-    max-width: 800px;
+/* ===============================================
+   FAQ DE INFORMACIÓN DE VUELO
+   =============================================== */
+.faq-section, .faq {
+    padding: 80px 8%;
+    max-width: 850px;
     margin: 0 auto;
 }
 
 .faq h1 {
-    font-size: 40px;
-    color: #0F172A;
+    font-size: 2.5rem;
+    color: var(--text-primary);
     text-align: center;
     margin-bottom: 40px;
 }
 
 .faq-item {
-    border-bottom: 1px solid #ddd;
-}
-
-.faq-pregunta {
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    padding: 20px 0;
-    font-size: 18px;
-    font-weight: bold;
-    color: #0F172A;
-    cursor: pointer;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.faq-respuesta {
-    display: none;
-    padding-bottom: 20px;
-    color: #666;
-    line-height: 1.6;
-}
-
-.faq-item.activo .faq-respuesta {
-    display: block;
-}
-
-/*FOOTER*/
-.footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 40px;
-    padding: 60px 80px 40px;
-    background-color: #0F172A;
-}
-
-.footer-col {
-    flex: 1;
-    min-width: 200px;
-}
-
-.footer-col h2 {
-    color: white;
-    font-size: 28px;
     margin-bottom: 15px;
-}
-
-.footer-col h3 {
-    color: white;
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.footer-col p {
-    color: #94a3b8;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 8px;
-}
-
-.footer-col a {
-    display: block;
-    color: #94a3b8;
-    text-decoration: none;
-    margin-bottom: 10px;
-    transition: .3s;
-}
-
-.footer-col a:hover {
-    color: white;
-}
-
-.footer-redes {
-    display: flex;
-    flex-direction: column;
-}
-
-.footer-derechos {
-    background-color: #0F172A;
-    border-top: 1px solid #334155;
-    text-align: center;
-    padding: 20px;
-}
-
-.footer-derechos p {
-    color: #94a3b8;
-    font-size: 14px;
-}
-
-/* Estilos para el despliegue de Preguntas Frecuentes */
-.faq-section {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-.faq-item {
-    margin-bottom: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     overflow: hidden;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
 }
 
 details {
-    padding: 15px 20px;
+    padding: 20px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: var(--transition);
 }
 
 details:hover {
-    background-color: #f8f9fa;
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 summary {
-    font-weight: bold;
-    font-size: 1.05rem;
-    color: #0f2347;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
     outline: none;
 }
 
 details p {
-    margin-top: 10px;
-    color: #555555;
-    line-height: 1.5;
+    margin-top: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
-/* Botón Check-in */
+/* ===============================================
+   MODAL DE CHECK-IN Y EMBARQUE
+   =============================================== */
 .btn-checkin {
-    background-color: #0f2347;
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: var(--bg-main);
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: var(--transition);
 }
 
 .btn-checkin:hover {
-    background-color: #1d3b6e;
+    box-shadow: var(--shadow-neon);
+    transform: translateY(-2px);
 }
 
 .modal {
@@ -703,31 +700,97 @@ details p {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(11, 19, 43, 0.85);
+    backdrop-filter: blur(8px);
     z-index: 3000;
 }
 
 .modal-contenido {
-    background-color: #ffffff;
-    margin: 10% auto;
-    padding: 25px;
+    background-color: var(--bg-card);
+    margin: 8% auto;
+    padding: 35px;
     width: 90%;
-    max-width: 400px;
-    border-radius: 10px;
+    max-width: 420px;
+    border-radius: var(--radius-tech);
+    border: 1px solid var(--accent-cyan);
     position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-panel);
     text-align: center;
 }
 
 .cerrar-modal {
     position: absolute;
-    right: 15px; top: 10px;
-    font-size: 26px;
+    right: 20px; top: 15px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    color: #333;
+    color: var(--text-secondary);
 }
 
 .cerrar-modal:hover {
-    color: #ff0000;
+    color: var(--accent-cyan);
+}
+
+/* ===============================================
+   FOOTER (TORRE DE CONTROL Y DERECHOS)
+   =============================================== */
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 80px 8% 40px;
+    background-color: var(--bg-surface);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-col h2 {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.footer-col h3 {
+    color: var(--accent-cyan);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.footer-col p, .footer-col a {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-col a:hover {
+    color: var(--accent-cyan);
+}
+
+.footer-derechos {
+    background-color: var(--bg-main);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    padding: 25px;
+}
+
+.footer-derechos p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ADAPTABILIDAD MÓVIL */
+@media (max-width: 850px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    .descripcion, .imagen {
+        width: 100%;
+    }
+    .nosotros-mv {
+        flex-direction: column;
+    }
 }
